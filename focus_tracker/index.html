@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Трекер фокуса: БВИ + Олимпиады + ЕГЭ 90+</title>
   
   <!-- PWA & Mobile Meta Tags -->
@@ -35,6 +35,8 @@
       
       --radius: 12px;
       --transition: all 0.2s ease;
+      --safe-t: env(safe-area-inset-top, 0px);
+      --safe-b: env(safe-area-inset-bottom, 0px);
     }
 
     * {
@@ -45,18 +47,35 @@
       -webkit-tap-highlight-color: transparent;
     }
 
+    html {
+      scroll-padding-top: 150px;
+    }
+
     body {
       background-color: var(--bg-primary);
+      background-image: radial-gradient(1100px 480px at 85% -10%, #1b2a52 0%, transparent 60%);
       color: var(--text-main);
       min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
     }
 
+    button {
+      font-family: inherit;
+    }
+
+    :focus-visible {
+      outline: 2px solid #38bdf8;
+      outline-offset: 2px;
+    }
+
     header {
-      background: var(--bg-secondary);
+      background: rgba(19, 27, 46, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 14px 20px;
+      padding: calc(12px + var(--safe-t)) max(20px, env(safe-area-inset-right)) 12px max(20px, env(safe-area-inset-left));
       position: sticky;
       top: 0;
       z-index: 50;
@@ -64,7 +83,7 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
     }
 
     .brand {
@@ -81,11 +100,23 @@
     }
 
     .brand-sub {
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--accent-cf);
       text-transform: uppercase;
       font-weight: 600;
       letter-spacing: 0.05em;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .age-badge {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #7dd3fc;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 0.68rem;
     }
 
     .clock-widget {
@@ -138,6 +169,11 @@
       background: #2563eb;
       color: #fff;
       border-color: #2563eb;
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    .btn:active, .nav-btn:active, .day-tab:active {
+      transform: scale(0.97);
     }
 
     main {
@@ -145,7 +181,7 @@
       max-width: 1200px;
       width: 100%;
       margin: 0 auto;
-      padding: 20px 16px 50px;
+      padding: 20px 16px calc(40px + var(--safe-b));
       display: flex;
       flex-direction: column;
       gap: 20px;
@@ -227,9 +263,9 @@
 
     .progress-bar-container {
       width: 100%;
-      height: 8px;
+      height: 10px;
       background: rgba(255, 255, 255, 0.1);
-      border-radius: 4px;
+      border-radius: 5px;
       overflow: hidden;
       margin: 4px 0;
     }
@@ -299,32 +335,28 @@
 
     /* DAY SELECTOR */
     .day-selector {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
+      display: flex;
       gap: 6px;
-      margin-bottom: 6px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
     }
 
-    @media (max-width: 768px) {
-      .day-selector {
-        grid-template-columns: repeat(4, 1fr);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .day-selector {
-        grid-template-columns: repeat(2, 1fr);
-      }
+    .day-selector::-webkit-scrollbar, .nav-tabs::-webkit-scrollbar {
+      display: none;
     }
 
     .day-tab {
+      flex: 1 1 0;
+      min-width: 110px;
       background: var(--bg-secondary);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 10px 6px;
+      padding: 10px 8px;
       text-align: center;
       cursor: pointer;
       transition: var(--transition);
+      color: inherit;
     }
 
     .day-tab:hover {
@@ -347,6 +379,10 @@
       letter-spacing: 0.05em;
     }
 
+    .day-tab .d-short {
+      display: none;
+    }
+
     .day-name {
       font-weight: 700;
       font-size: 0.92rem;
@@ -361,6 +397,36 @@
       text-overflow: ellipsis;
     }
 
+    /* DAY SUMMARY & FILTER */
+    .day-summary {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px 16px;
+      margin: 8px 0 12px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .day-summary b {
+      color: #fff;
+    }
+
+    .ds-bar {
+      flex: 1 1 140px;
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .ds-bar i {
+      display: block;
+      height: 100%;
+      background: linear-gradient(90deg, #34d399, #38bdf8);
+      transition: width 0.4s;
+    }
+
     /* SCHEDULE SLOTS */
     .schedule-container {
       display: flex;
@@ -371,6 +437,7 @@
     .slot-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
+      border-left: 4px solid var(--c, #475569);
       border-radius: var(--radius);
       padding: 14px 16px;
       display: grid;
@@ -380,6 +447,14 @@
       transition: var(--transition);
       position: relative;
     }
+
+    .slot-card[data-type="bvi"] { --c: var(--accent-bvi); }
+    .slot-card[data-type="cf"] { --c: var(--accent-cf); }
+    .slot-card[data-type="math"] { --c: var(--accent-math); }
+    .slot-card[data-type="rus"] { --c: var(--accent-rus); }
+    .slot-card[data-type="ege"] { --c: var(--accent-ege); }
+    .slot-card[data-type="rest"] { --c: var(--accent-rest); }
+    .slot-card[data-type="school"] { --c: var(--accent-school); }
 
     @media (max-width: 640px) {
       .slot-card {
@@ -400,6 +475,17 @@
       border-color: #38bdf8;
       background: #1e2947;
       box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+    }
+
+    .slot-card.is-current::after {
+      content: 'СЕЙЧАС';
+      position: absolute;
+      top: 6px;
+      right: 65px;
+      font-size: 0.6rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: #38bdf8;
     }
 
     .slot-card.completed {
@@ -462,9 +548,9 @@
     .badge-school { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(100, 116, 139, 0.3); }
 
     .checkbox-btn {
-      width: 28px;
-      height: 28px;
-      border-radius: 6px;
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
       border: 2px solid #475569;
       background: transparent;
       cursor: pointer;
@@ -550,6 +636,33 @@
     .diff-med { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
     .diff-low { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
 
+    .ege-progress-wrap {
+      margin-top: 2px;
+    }
+
+    .ege-pct {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .ege-progress {
+      height: 6px;
+      border-radius: 3px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+    }
+
+    .ege-progress i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #a855f7, #38bdf8);
+      transition: width 0.3s;
+    }
+
     .ege-checklist {
       list-style: none;
       display: flex;
@@ -558,19 +671,87 @@
       font-size: 0.85rem;
     }
 
-    .ege-checklist li {
+    .ege-checklist li label {
       display: flex;
-      align-items: flex-start;
       gap: 8px;
+      cursor: pointer;
+      padding: 3px 0;
       color: #cbd5e1;
     }
 
     .ege-checklist input[type="checkbox"] {
-      margin-top: 3px;
+      width: 17px;
+      height: 17px;
+      flex: none;
+      margin-top: 2px;
       accent-color: #38bdf8;
     }
 
+    .ege-checklist label:has(input:checked) {
+      color: #64748b;
+      text-decoration: line-through;
+    }
+
+    /* MOCK SUMMARY STATS */
+    .mock-summary {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      min-width: 110px;
+    }
+
+    .stat small {
+      display: block;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat b {
+      font-size: 1.1rem;
+      color: #fff;
+    }
+
     /* CODEFORCES ERROR TRACKER */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .chip {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 5px 11px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .chip:hover {
+      color: #fff;
+      border-color: #475569;
+    }
+
+    .chip.active {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+      color: #fff;
+    }
+
     .form-group {
       display: flex;
       flex-direction: column;
@@ -663,7 +844,7 @@
       background: var(--bg-secondary);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      max-width: 620px;
+      max-width: 640px;
       width: 100%;
       max-height: 90vh;
       overflow-y: auto;
@@ -739,13 +920,14 @@
       left: 0;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       background: #060911;
       z-index: 200;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 24px;
+      padding: calc(24px + var(--safe-t)) 24px calc(24px + var(--safe-b));
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s ease;
@@ -782,10 +964,83 @@
       max-width: 600px;
     }
 
+    .zen-msg {
+      margin-top: 14px;
+      min-height: 1.4em;
+      color: #34d399;
+      font-weight: 600;
+      text-align: center;
+      font-size: 0.92rem;
+    }
+
     .btn-exit-focus {
       position: absolute;
-      top: 20px;
+      top: calc(20px + var(--safe-t));
       right: 20px;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(24px + var(--safe-b));
+      transform: translate(-50%, 20px);
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 300;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 720px) {
+      header {
+        gap: 8px;
+      }
+      .brand-sub, .clock-date {
+        display: none;
+      }
+      .clock-widget {
+        padding: 4px 10px;
+      }
+      .nav-tabs {
+        width: 100%;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      main {
+        padding: 14px 12px calc(40px + var(--safe-b));
+      }
+      .day-tab {
+        min-width: 52px;
+        padding: 8px 6px;
+      }
+      .day-tab .d-full, .day-sub {
+        display: none;
+      }
+      .day-tab .d-short {
+        display: inline;
+        font-weight: 700;
+      }
+      .day-tab.is-today::after {
+        content: 'ТОТ';
+      }
+      .slot-card.is-current::after {
+        top: 4px;
+        right: 50px;
+      }
     }
 
     .d-none { display: none !important; }
@@ -798,7 +1053,10 @@
     <div class="brand">
       <div>
         <div class="brand-title">БВИ & Олимпиадный трекер</div>
-        <div class="brand-sub">Стратегия 90+ ЕГЭ & Защита от перегрузок</div>
+        <div class="brand-sub">
+          <span class="age-badge">16 лет • 10 класс</span>
+          <span>Олимпиадный разгон & ЕГЭ 90+</span>
+        </div>
       </div>
     </div>
 
@@ -808,9 +1066,10 @@
     </div>
 
     <div class="nav-tabs">
-      <button class="nav-btn active" onclick="switchMainTab('schedule')">Расписание</button>
-      <button class="nav-btn" onclick="switchMainTab('ege')">ЕГЭ 90+</button>
-      <button class="nav-btn" onclick="switchMainTab('cf-mistakes')">Ошибки Codeforces</button>
+      <button class="nav-btn active" data-tab="schedule" onclick="switchMainTab('schedule')">Расписание</button>
+      <button class="nav-btn" data-tab="ege" onclick="switchMainTab('ege')">ЕГЭ 90+</button>
+      <button class="nav-btn" data-tab="cf-mistakes" onclick="switchMainTab('cf-mistakes')">Ошибки Codeforces</button>
+      <button class="nav-btn" data-tab="age16" onclick="switchMainTab('age16')" style="border-color: #818cf8; color: #a5b4fc;">Траектория 16 лет</button>
       <button class="nav-btn" onclick="openFlexModal()">Протокол гибкости</button>
       <button class="nav-btn" style="border-color: #38bdf8; color: #38bdf8;" onclick="startFocusMode()">Фокус-режим</button>
       <button class="nav-btn" style="border-color: #34d399; color: #34d399;" onclick="openPhoneModal()">На телефон</button>
@@ -852,24 +1111,32 @@
 
     <!-- TAB 1: SCHEDULE VIEW -->
     <div id="tab-schedule">
-      <div class="day-selector" id="daySelector">
-        <!-- populated by JS -->
+      <div class="day-selector" id="daySelector"></div>
+
+      <!-- DAY SUMMARY & TOGGLE -->
+      <div class="day-summary" id="daySummary">
+        <span>Выполнено: <b id="dsDone">0</b> из <b id="dsTotal">0</b> (<span id="dsPct">0%</span>)</span>
+        <div class="ds-bar"><i id="dsBarFill" style="width: 0%;"></i></div>
+        <button class="btn btn-outline" id="btnOnlyStudy" style="padding: 4px 10px; font-size: 0.78rem;" onclick="toggleOnlyStudy()">Только учёба</button>
+        <button class="btn btn-outline" style="padding: 4px 10px; font-size: 0.78rem;" onclick="exportData()">Экспорт JSON</button>
+        <label class="btn btn-outline" style="padding: 4px 10px; font-size: 0.78rem; cursor: pointer;">
+          Импорт JSON
+          <input type="file" id="importFile" accept="application/json" style="display: none;" onchange="importData(this)">
+        </label>
       </div>
 
-      <div class="schedule-container" id="slotsContainer">
-        <!-- populated by JS -->
-      </div>
+      <div class="schedule-container" id="slotsContainer"></div>
     </div>
 
     <!-- TAB 2: EGE 90+ PREPARATION -->
     <div id="tab-ege" class="d-none">
       <div class="panel">
         <div class="panel-title">
-          <span>Стратегия ЕГЭ на 90+ баллов по предметам</span>
+          <span>Стратегия ЕГЭ на 90+ баллов</span>
           <span style="font-size: 0.82rem; font-weight: 500; color: #38bdf8;">Целевая сумма: 270–280+ баллов</span>
         </div>
         <p style="font-size: 0.88rem; color: var(--text-muted);">
-          Предметы распределены по специфике подготовки. Олимпиадная база закрывает вторую часть математики и информатики, но ЕГЭ требует безупречной автоматизации критериев и безошибочного решения первой части.
+          В 16 лет цель по ЕГЭ — закрепить безошибочную первую часть и критерии оформления задач второй части. Это обеспечит гарантированное подтверждение олимпиадного диплома (75+ баллов) и бюджет при резервном сценарии.
         </p>
 
         <div class="ege-grid">
@@ -881,7 +1148,7 @@
               <span class="ege-difficulty diff-high">Сложность: Высокая</span>
             </div>
             <p style="font-size: 0.8rem; color: var(--text-muted);">
-              Основная ловушка — потеря баллов на оформлении №18 (параметры) и №14/17 (геометрия). Олимпиадные методы дают преимущество в №19 (теория чисел).
+              Основная ловушка — потеря баллов на оформлении №18 (параметры) и №14/17 (геометрия). Олимпиадная база дает преимущество в №19 (теория чисел).
             </p>
             <ul class="ege-checklist" id="ege-checklist-math">
               <li><label><input type="checkbox" data-subject="math" data-task="part1"> 1-я часть (№1–12): отработка до автоматизма (макс. 30 мин)</label></li>
@@ -952,8 +1219,12 @@
 
         <!-- ПРОБНИКИ ТРЕКЕР -->
         <div style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 6px;">
-          <h3 style="font-size: 1.05rem; color: #fff; margin-bottom: 10px;">Журнал пробников (ЕГЭ)</h3>
-          <div class="cf-form-grid">
+          <h3 style="font-size: 1.05rem; color: #fff; margin-bottom: 6px;">Журнал пробников (ЕГЭ)</h3>
+          
+          <!-- SUMMARY CARDS -->
+          <div class="mock-summary" id="mockSummary"></div>
+
+          <div class="cf-form-grid" style="margin-top: 14px;">
             <div class="form-group">
               <label>Предмет</label>
               <select id="mockSubject">
@@ -978,9 +1249,7 @@
           </div>
           <button class="btn btn-primary" style="margin-top: 10px;" onclick="saveMockResult()">Сохранить результат пробника</button>
 
-          <div id="mockResultsList" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
-            <!-- list of mocks -->
-          </div>
+          <div id="mockResultsList" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
       </div>
@@ -1025,13 +1294,64 @@
           <button class="btn btn-primary" style="margin-top: 10px;" onclick="addCfMistake()">Добавить в журнал ошибок</button>
         </div>
 
-        <div style="margin-top: 8px;">
+        <div style="margin-top: 12px;">
+          <div class="chips" id="cfFilters"></div>
           <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 8px;">Сохраненные ошибки:</h4>
-          <div id="cfMistakesList" style="display: flex; flex-direction: column; gap: 8px;">
-            <!-- populated by JS -->
-          </div>
+          <div id="cfMistakesList" style="display: flex; flex-direction: column; gap: 8px;"></div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- TAB 4: 16-YEAR-OLD STRATEGY TAB -->
+    <div id="tab-age16" class="d-none">
+      <div class="panel">
+        <div class="panel-title">
+          <span>Стратегия подготовки в 16 лет (10 класс)</span>
+          <span style="font-size: 0.82rem; color: #818cf8;">БВИ за 10 класс & Сохранение ресурсов</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          В 16 лет у тебя есть ключевое преимущество — время. Сейчас олимпиадная подготовка дает максимальный КПД: дипломы 10 класса защищают поступление на 4 года вперед, а отсутствие горящих дедлайнов ЕГЭ позволяет спокойно осваивать сложные алгоритмические структуры.
+        </p>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px;">
+          
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius); border-left: 4px solid #38bdf8;">
+            <strong style="color: #7dd3fc; font-size: 1rem;">1. Олимпиадные права дипломов 10 класса</strong>
+            <ul style="margin-left: 18px; margin-top: 8px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5;">
+              <li><strong>Срок действия:</strong> по закону об образовании дипломы РСОШ действуют 4 года (включая год получения). ВШЭ, МФТИ, МГУ, ИТМО принимают дипломы за 10 класс на БВИ или 100 баллов!</li>
+              <li><strong>Автопроход в финал:</strong> даже если вуз требует диплом за 11 класс, статус призера в 10 классе освобождает от отборочных этапов в 11 классе.</li>
+              <li><strong>Фокус сейчас:</strong> выложиться на финалах МОШ, Высшей пробы, Олимпиады ИТМО и Технокубка уже в этом сезоне.</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius); border-left: 4px solid #34d399;">
+            <strong style="color: #6ee7b7; font-size: 1rem;">2. Биология и сон 16-летнего подростка</strong>
+            <ul style="margin-left: 18px; margin-top: 8px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5;">
+              <li><strong>Норма сна:</strong> строго 8 часов (23:00–07:00). В 16 лет мозг продолжает синаптическую перестройку. При недосыпе логические цепочки алгоритмов стираются из долговременной памяти.</li>
+              <li><strong>Защита от ночной учебы:</strong> учеба после 23:00 снижает скорость решения олимпиадных задач на 30% на следующий день.</li>
+              <li><strong>Воскресная разгрузка:</strong> вторая половина воскресенья свободна, чтобы в понедельник голова была ясной.</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius); border-left: 4px solid #f59e0b;">
+            <strong style="color: #fcd34d; font-size: 1rem;">3. Зрение и осанка (Правило 20-20-20)</strong>
+            <ul style="margin-left: 18px; margin-top: 8px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5;">
+              <li><strong>Гимнастика для глаз:</strong> после каждого фокус-раунда (40–50 мин) посмотри на удаленный объект за окном на 20 секунд. Это снимает спазм аккомодации.</li>
+              <li><strong>Разминка шеи:</strong> 2 минуты легких круговых движений и растяжки плеч восстанавливают кровоснабжение мозга.</li>
+              <li><strong>Спорт в пятницу 20:00–21:00:</strong> обязательная физическая активность против сколиоза и гиподинамии.</li>
+            </ul>
+          </div>
+
+          <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius); border-left: 4px solid #ec4899;">
+            <strong style="color: #f472b6; font-size: 1rem;">4. Дофаминовый баланс и друзья</strong>
+            <ul style="margin-left: 18px; margin-top: 8px; color: #cbd5e1; font-size: 0.85rem; line-height: 1.5;">
+              <li><strong>Суббота 13:00–17:00 (друзья):</strong> психологическая перезагрузка. Общение со сверстниками необходимо для нервной системы подростка.</li>
+              <li><strong>Никакой вины за отдых:</strong> если слот запланирован как отдых, отдыхай полностью без мыслей о нерешенных задачах.</li>
+            </ul>
+          </div>
+
+        </div>
       </div>
     </div>
 
@@ -1144,7 +1464,7 @@
           <p style="margin-top: 5px; color: #cbd5e1;">
             1. Запусти на компьютере <code>python run_app.py</code>.<br>
             2. Подключи телефон к тому же домашнему Wi-Fi.<br>
-            3. Введи сетевой адрес из консоли компьютера (например, <code>http://192.168.x.x:5050</code>) в браузере телефона.
+            3. Введи сетевой адрес из консоли компьютера в браузере телефона.
           </p>
         </div>
 
@@ -1155,13 +1475,12 @@
             <li><strong style="color:#fff;">Android (Chrome):</strong> нажми три точки в правом верхнем углу &rarr; <em>«Установить приложение»</em> или <em>«Добавить на главный экран»</em>.</li>
             <li><strong style="color:#fff;">iPhone (Safari):</strong> нажми кнопку <em>«Поделиться»</em> (квадрат со стрелкой вверх) &rarr; выбери <em>«На экран «Домой»»</em>.</li>
           </ul>
-          <p style="margin-top: 5px; color: #94a3b8; font-size: 0.82rem;">После добавления иконка появится на рабочем столе телефона, приложение будет открываться во весь экран и работать без рамок браузера.</p>
         </div>
 
         <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #a855f7;">
           <strong style="color: #d8b4fe; font-size: 0.95rem;">Способ 3. Бесплатная публикация в интернет (доступ отовсюду)</strong>
           <p style="margin-top: 5px; color: #cbd5e1;">
-            Чтобы открывать трекер вне дома через мобильную сеть, загрузи файлы папки в репозиторий на GitHub и включи <strong>GitHub Pages</strong> в настройках. Получится постоянная ссылка вида <code>https://твой-логин.github.io/focus_tracker</code>.
+            Загрузи файлы репозитория прямо в корень на GitHub и открой свою ссылку GitHub Pages на телефоне.
           </p>
         </div>
       </div>
@@ -1179,27 +1498,30 @@
     <div class="focus-timer-large" id="focusZenTimer">25:00</div>
     <div class="focus-task-name" id="focusZenTitle">Текущая задача</div>
     <div class="focus-task-desc" id="focusZenDesc">Описание задачи и фокус внимания</div>
+    <div class="zen-msg" id="zenMsg"></div>
 
-    <div style="display: flex; gap: 10px; margin-top: 24px;">
+    <div style="display: flex; gap: 10px; margin-top: 20px;">
       <button class="btn btn-outline" onclick="adjustZenTimer(-5)">-5 мин</button>
       <button class="btn btn-primary" id="zenToggleBtn" onclick="toggleZenTimer()">Пауза</button>
       <button class="btn btn-outline" onclick="adjustZenTimer(5)">+5 мин</button>
     </div>
   </div>
 
+  <!-- TOAST -->
+  <div class="toast" id="toast"></div>
+
   <!-- SCRIPTS -->
   <script>
-    // Register Service Worker for PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js').catch(() => {});
       });
     }
 
-    // --- SCHEDULE DATA ---
     const SCHEDULE = {
       1: {
         name: "Понедельник",
+        short: "Пн",
         subtitle: "Математика и русский язык (Главный учебный день)",
         slots: [
           { start: "07:00", end: "07:30", title: "Подъём, гигиена, завтрак", desc: "Утренний запуск дня, настройка", badge: "Отдых", type: "rest" },
@@ -1210,7 +1532,7 @@
           { start: "17:30", end: "19:00", title: "Вузовская математика: задания лекции", desc: "Выполнение заданий лекции, разбор сложных задач и доказательств", badge: "БВИ №1", type: "bvi" },
           { start: "19:00", end: "19:45", title: "Ужин, отдых", desc: "Прием пищи, переключение внимания", badge: "Отдых", type: "rest" },
           { start: "19:45", end: "20:45", title: "Олимпиадный русский + Тест ЕГЭ", desc: "Грамматика, лексика, разбор сложных заданий орфографии/пунктуации (№9–21)", badge: "Олимпиады / ЕГЭ 90+", type: "rus" },
-          { start: "20:45", end: "21:15", title: "Перерыв", desc: "Чай, легкая разминка", badge: "Отдых", type: "rest" },
+          { start: "20:45", end: "21:15", title: "Перерыв", desc: "Чай, легкая разминка глаз и шеи", badge: "Отдых", type: "rest" },
           { start: "21:15", end: "21:45", title: "Проверка решений по математике", desc: "Анализ ошибок, оформление и закрепление конспекта", badge: "БВИ №1", type: "bvi" },
           { start: "21:45", end: "23:00", title: "Свободное время, подготовка ко сну", desc: "Отключение гаджетов за 30 мин до сна", badge: "Отдых", type: "rest" },
           { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Полное восстановление сил. Залог продуктивности всей недели", badge: "Сон", type: "rest" }
@@ -1218,6 +1540,7 @@
       },
       2: {
         name: "Вторник",
+        short: "Вт",
         subtitle: "Вузовская математика и алгоритмы (Приоритет БВИ + Codeforces)",
         slots: [
           { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Утренний подъем без спешки", badge: "Отдых", type: "rest" },
@@ -1236,6 +1559,7 @@
       },
       3: {
         name: "Среда",
+        short: "Ср",
         subtitle: "Математическое моделирование и ML (День профильных курсов)",
         slots: [
           { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Утренний распорядок", badge: "Отдых", type: "rest" },
@@ -1254,6 +1578,7 @@
       },
       4: {
         name: "Четверг",
+        short: "Чт",
         subtitle: "Алгоритмы и олимпиадная математика (Самостоятельная подготовка)",
         slots: [
           { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Подъем", badge: "Отдых", type: "rest" },
@@ -1272,6 +1597,7 @@
       },
       5: {
         name: "Пятница",
+        short: "Пт",
         subtitle: "Математика и спорт (День закрепления)",
         slots: [
           { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Подъем", badge: "Отдых", type: "rest" },
@@ -1288,6 +1614,7 @@
       },
       6: {
         name: "Суббота",
+        short: "Сб",
         subtitle: "Алгоритмы, английский и друзья (Учеба только утром)",
         slots: [
           { start: "07:00", end: "08:00", title: "Подъём, завтрак, утренние дела", desc: "Спокойное неспешное субботнее утро", badge: "Отдых", type: "rest" },
@@ -1306,6 +1633,7 @@
       },
       0: {
         name: "Воскресенье",
+        short: "Вс",
         subtitle: "Главная олимпиадная тренировка (Фокус на контесте)",
         slots: [
           { start: "07:00", end: "08:00", title: "Подъём, завтрак", desc: "Плотный завтрак перед умственной нагрузкой", badge: "Отдых", type: "rest" },
@@ -1333,8 +1661,10 @@
     let zenTimerInterval = null;
     let zenSecondsRemaining = 25 * 60;
     let zenIsRunning = false;
+    let onlyStudyFilter = false;
+    let activeCfFilter = "all";
+    let toastTimer = null;
 
-    // --- INITIALIZATION ---
     function init() {
       renderDaySelector();
       renderSlots();
@@ -1344,9 +1674,9 @@
       loadMockResults();
       loadCfMistakes();
       bindEgeEvents();
+      updateEgeProgress();
     }
 
-    // --- CLOCK & CURRENT SLOT TRACKER ---
     function updateClock() {
       const now = new Date();
       const timeStr = now.toLocaleTimeString('ru-RU', { hour12: false });
@@ -1434,7 +1764,6 @@
       }
     }
 
-    // --- DAY SELECTOR & SLOTS RENDERING ---
     function renderDaySelector() {
       const container = document.getElementById('daySelector');
       container.innerHTML = '';
@@ -1453,7 +1782,10 @@
         };
 
         tab.innerHTML = `
-          <div class="day-name">${d.name}</div>
+          <div class="day-name">
+            <span class="d-full">${d.name}</span>
+            <span class="d-short">${d.short}</span>
+          </div>
           <div class="day-sub">${d.subtitle.split('(')[0]}</div>
         `;
         container.appendChild(tab);
@@ -1496,7 +1828,21 @@
       const index = daySlots.findIndex(s => s.start === activeSlot.start && s.end === activeSlot.end);
       if (index !== -1) {
         toggleSlotCompleted(today, index);
+        toast("Занятие отмечено выполненным");
       }
+    }
+
+    function toggleOnlyStudy() {
+      onlyStudyFilter = !onlyStudyFilter;
+      const btn = document.getElementById('btnOnlyStudy');
+      if (onlyStudyFilter) {
+        btn.classList.add('btn-primary');
+        btn.classList.remove('btn-outline');
+      } else {
+        btn.classList.remove('btn-primary');
+        btn.classList.add('btn-outline');
+      }
+      renderSlots();
     }
 
     function renderSlots() {
@@ -1508,9 +1854,22 @@
       const now = new Date();
       const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
+      let totalSlots = 0;
+      let completedSlots = 0;
+
       dayData.slots.forEach((slot, index) => {
         const completed = isSlotCompleted(selectedDay, index);
-        
+        const isStudy = ['bvi', 'cf', 'math', 'rus', 'ege'].includes(slot.type);
+
+        if (isStudy || !onlyStudyFilter) {
+          totalSlots++;
+          if (completed) completedSlots++;
+        }
+
+        if (onlyStudyFilter && !isStudy) {
+          return;
+        }
+
         let isCurrent = false;
         if (today === selectedDay) {
           const startMin = timeToMinutes(slot.start);
@@ -1524,6 +1883,7 @@
 
         const card = document.createElement('div');
         card.className = `slot-card ${isCurrent ? 'is-current' : ''} ${completed ? 'completed' : ''}`;
+        card.dataset.type = slot.type;
         
         card.innerHTML = `
           <div class="slot-time">${slot.start} – ${slot.end}</div>
@@ -1543,27 +1903,37 @@
 
         container.appendChild(card);
       });
+
+      // Update Summary Bar
+      const pct = totalSlots > 0 ? Math.round((completedSlots / totalSlots) * 100) : 0;
+      document.getElementById('dsDone').textContent = completedSlots;
+      document.getElementById('dsTotal').textContent = totalSlots;
+      document.getElementById('dsPct').textContent = `${pct}%`;
+      document.getElementById('dsBarFill').style.width = `${pct}%`;
     }
 
-    // --- TABS SWITCHING ---
     function switchMainTab(tab) {
       document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      const activeBtn = document.querySelector(`.nav-btn[data-tab="${tab}"]`);
+      if (activeBtn) activeBtn.classList.add('active');
 
       document.getElementById('tab-schedule').classList.add('d-none');
       document.getElementById('tab-ege').classList.add('d-none');
       document.getElementById('tab-cf-mistakes').classList.add('d-none');
+      document.getElementById('tab-age16').classList.add('d-none');
 
       if (tab === 'schedule') {
         document.getElementById('tab-schedule').classList.remove('d-none');
       } else if (tab === 'ege') {
         document.getElementById('tab-ege').classList.remove('d-none');
+        updateEgeProgress();
       } else if (tab === 'cf-mistakes') {
         document.getElementById('tab-cf-mistakes').classList.remove('d-none');
+      } else if (tab === 'age16') {
+        document.getElementById('tab-age16').classList.remove('d-none');
       }
     }
 
-    // --- MODALS ---
     function openFlexModal() {
       document.getElementById('flexModal').classList.add('show');
     }
@@ -1578,6 +1948,14 @@
 
     function closePhoneModal() {
       document.getElementById('phoneModal').classList.remove('show');
+    }
+
+    function toast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
     }
 
     // --- ZEN FOCUS MODE ---
@@ -1596,6 +1974,14 @@
       } catch(e) {}
     }
 
+    const ZEN_TIPS = [
+      "Фокусируйся только на одной задаче. Отложи телефон экраном вниз.",
+      "Правило 20-20-20: каждые 25 минут посмотри в окно вдаль на 20 секунд.",
+      "Глубокое дыхание и прямая спина увеличивают снабжение мозга кислородом.",
+      "Если задача не решается — напиши ручкой на бумаге ключевые условия.",
+      "Олимпиадный навык формируется при преодолении сопротивления. Держи фокус!"
+    ];
+
     function startFocusMode() {
       const overlay = document.getElementById('focusOverlay');
       overlay.classList.add('active');
@@ -1608,6 +1994,7 @@
         document.getElementById('focusZenDesc').textContent = "Концентрация на выбранной задаче";
       }
 
+      document.getElementById('zenMsg').textContent = ZEN_TIPS[Math.floor(Math.random() * ZEN_TIPS.length)];
       zenSecondsRemaining = 25 * 60;
       updateZenDisplay();
       zenIsRunning = true;
@@ -1622,7 +2009,8 @@
         } else {
           zenIsRunning = false;
           playBeep();
-          alert("Фокусный раунд завершен! Сделай короткий перерыв.");
+          toast("Фокусный раунд завершен! Сделай разминку для глаз.");
+          alert("Фокусный раунд завершен! Встань, разомни шею и посмотри вдаль.");
         }
       }, 1000);
     }
@@ -1650,14 +2038,40 @@
       updateZenDisplay();
     }
 
-    // --- EGE CHECKLIST PERSISTENCE ---
+    // --- EGE PROGRESS & MOCKS ---
     function bindEgeEvents() {
       document.querySelectorAll('.ege-checklist input[type="checkbox"]').forEach(box => {
         box.addEventListener('change', () => {
           const subject = box.dataset.subject;
           const task = box.dataset.task;
           localStorage.setItem(`ege_${subject}_${task}`, box.checked);
+          updateEgeProgress();
         });
+      });
+    }
+
+    function updateEgeProgress() {
+      document.querySelectorAll('.ege-card').forEach(card => {
+        const boxes = [...card.querySelectorAll('input[type="checkbox"]')];
+        if (!boxes.length) return;
+        const done = boxes.filter(b => b.checked).length;
+        const pct = Math.round((done / boxes.length) * 100);
+
+        let wrap = card.querySelector('.ege-progress-wrap');
+        if (!wrap) {
+          wrap = document.createElement('div');
+          wrap.className = 'ege-progress-wrap';
+          wrap.innerHTML = `
+            <div class="ege-pct">
+              <span>Освоено тем</span>
+              <span class="pct-num"></span>
+            </div>
+            <div class="ege-progress"><i></i></div>
+          `;
+          card.querySelector('.ege-checklist').before(wrap);
+        }
+        wrap.querySelector('.pct-num').textContent = `${done}/${boxes.length} (${pct}%)`;
+        wrap.querySelector('i').style.width = `${pct}%`;
       });
     }
 
@@ -1676,7 +2090,6 @@
       if (mockDateInput) mockDateInput.value = todayStr;
     }
 
-    // --- MOCK RESULTS JOURNAL ---
     function saveMockResult() {
       const subject = document.getElementById('mockSubject').value;
       const score = document.getElementById('mockScore').value;
@@ -1695,6 +2108,7 @@
       document.getElementById('mockScore').value = '';
       document.getElementById('mockNotes').value = '';
       loadMockResults();
+      toast("Результат пробника сохранен");
     }
 
     function deleteMockResult(id) {
@@ -1704,9 +2118,37 @@
       loadMockResults();
     }
 
+    function renderMockSummary(mocks) {
+      const el = document.getElementById('mockSummary');
+      if (!el) return;
+      const latest = {};
+      mocks.forEach(m => {
+        if (!(m.subject in latest)) latest[m.subject] = m;
+      });
+
+      let html = '';
+      let sum = 0;
+      let count = 0;
+      const mainSubjects = ['Математика', 'Русский язык', 'Информатика', 'Английский'];
+
+      mainSubjects.forEach(sub => {
+        const m = latest[sub];
+        html += `<div class="stat"><small>${sub}</small><b>${m ? m.score : '—'}</b></div>`;
+        if (m && sub !== 'Английский') {
+          sum += m.score;
+          count++;
+        }
+      });
+
+      html += `<div class="stat" style="border-color: #38bdf8;"><small>Сумма 3 предметов</small><b style="color: #38bdf8;">${count === 3 ? sum : '—'} / 270+</b></div>`;
+      el.innerHTML = html;
+    }
+
     function loadMockResults() {
       const container = document.getElementById('mockResultsList');
       const mocks = JSON.parse(localStorage.getItem('ege_mocks') || '[]');
+
+      renderMockSummary(mocks);
 
       if (mocks.length === 0) {
         container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.82rem;">Результатов пробников пока нет. Запиши первый после решения варианта.</div>';
@@ -1730,7 +2172,7 @@
       });
     }
 
-    // --- CODEFORCES MISTAKES JOURNAL ---
+    // --- CODEFORCES MISTAKES ---
     function addCfMistake() {
       const problem = document.getElementById('cfProblem').value.trim();
       const type = document.getElementById('cfErrorType').value;
@@ -1751,6 +2193,7 @@
       document.getElementById('cfTopic').value = '';
       document.getElementById('cfNotes').value = '';
       loadCfMistakes();
+      toast("Ошибка добавлена в журнал");
     }
 
     function deleteCfMistake(id) {
@@ -1762,15 +2205,41 @@
 
     function loadCfMistakes() {
       const container = document.getElementById('cfMistakesList');
+      const filtersContainer = document.getElementById('cfFilters');
       const mistakes = JSON.parse(localStorage.getItem('cf_mistakes') || '[]');
 
-      if (mistakes.length === 0) {
-        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.82rem;">Ошибок пока не зафиксировано. Вноси сюда задачи после контестов.</div>';
+      // Render Filter Chips
+      const types = [
+        "all",
+        "Не понял идею алгоритма",
+        "Не заметил математическое наблюдение",
+        "Ошибка реализации",
+        "Не учёл граничный случай",
+        "Не хватило времени"
+      ];
+
+      filtersContainer.innerHTML = '';
+      types.forEach(t => {
+        const count = t === "all" ? mistakes.length : mistakes.filter(m => m.type.includes(t) || t.includes(m.type)).length;
+        const chip = document.createElement('button');
+        chip.className = `chip ${activeCfFilter === t ? 'active' : ''}`;
+        chip.textContent = t === "all" ? `Все (${count})` : `${t.split(' ')[0]}.. (${count})`;
+        chip.onclick = () => {
+          activeCfFilter = t;
+          loadCfMistakes();
+        };
+        filtersContainer.appendChild(chip);
+      });
+
+      const filtered = activeCfFilter === "all" ? mistakes : mistakes.filter(m => m.type.includes(activeCfFilter) || activeCfFilter.includes(m.type));
+
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.82rem;">Записей в этой категории нет.</div>';
         return;
       }
 
       container.innerHTML = '';
-      mistakes.forEach(m => {
+      filtered.forEach(m => {
         const item = document.createElement('div');
         item.className = 'error-item';
         item.innerHTML = `
@@ -1789,7 +2258,48 @@
       });
     }
 
-    // Start on load
+    // --- DATA EXPORT & IMPORT ---
+    const DATA_PREFIX_RE = /^(completed_|ege_|cf_mistakes)/;
+
+    function exportData() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (DATA_PREFIX_RE.test(k)) {
+          data[k] = localStorage.getItem(k);
+        }
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `focus-tracker-backup-${getCompletedDateKey()}.json`;
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      toast("Резервная копия сохранена в файл");
+    }
+
+    function importData(input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          Object.keys(data).forEach(k => {
+            if (DATA_PREFIX_RE.test(k)) {
+              localStorage.setItem(k, data[k]);
+            }
+          });
+          toast("Данные успешно восстановлены!");
+          init();
+        } catch (err) {
+          alert("Ошибка чтения JSON-файла");
+        }
+      };
+      reader.readAsText(file);
+      input.value = '';
+    }
+
     window.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
