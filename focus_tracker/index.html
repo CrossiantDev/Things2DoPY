@@ -1,0 +1,1796 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Трекер фокуса: БВИ + Олимпиады + ЕГЭ 90+</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#131b2e">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Фокус-трекер">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #131b2e;
+      --bg-card: #1a243b;
+      --bg-card-hover: #222f4c;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border: #293552;
+      
+      --accent-bvi: #ec4899;
+      --accent-cf: #38bdf8;
+      --accent-math: #fbbf24;
+      --accent-rus: #f87171;
+      --accent-ege: #a855f7;
+      --accent-rest: #34d399;
+      --accent-school: #64748b;
+      
+      --radius: 12px;
+      --transition: all 0.2s ease;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 20px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--accent-cf);
+      text-transform: uppercase;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    .clock-widget {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      background: var(--bg-primary);
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    .clock-time {
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      color: #38bdf8;
+    }
+
+    .clock-date {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .nav-btn:hover {
+      background: var(--bg-card);
+      color: var(--text-main);
+    }
+
+    .nav-btn.active {
+      background: #2563eb;
+      color: #fff;
+      border-color: #2563eb;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 16px 50px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* CURRENT HERO SLOT */
+    .hero-current {
+      background: linear-gradient(135deg, #162038 0%, #1a284a 100%);
+      border: 1px solid #3b82f644;
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-current::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: #38bdf8;
+    }
+
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .hero-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hero-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      margin-top: 4px;
+      color: #fff;
+    }
+
+    .hero-timer-box {
+      text-align: right;
+    }
+
+    @media (max-width: 600px) {
+      .hero-timer-box {
+        text-align: left;
+        width: 100%;
+      }
+    }
+
+    .hero-timer {
+      font-size: 2.2rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-timer-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin: 4px 0;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #38bdf8, #818cf8);
+      width: 0%;
+      transition: width 1s linear;
+    }
+
+    .hero-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.88rem;
+    }
+
+    .hero-next {
+      color: var(--text-muted);
+    }
+
+    .hero-next strong {
+      color: var(--text-main);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: var(--transition);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: #2563eb;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--text-main);
+    }
+
+    .btn-outline:hover {
+      background: var(--bg-card);
+    }
+
+    /* DAY SELECTOR */
+    .day-selector {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 768px) {
+      .day-selector {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .day-selector {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .day-tab {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 10px 6px;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .day-tab:hover {
+      background: var(--bg-card);
+      border-color: #475569;
+    }
+
+    .day-tab.active {
+      background: #1e3a8a;
+      border-color: #3b82f6;
+    }
+
+    .day-tab.is-today::after {
+      content: 'СЕГОДНЯ';
+      display: block;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-top: 3px;
+      letter-spacing: 0.05em;
+    }
+
+    .day-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+    }
+
+    .day-sub {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* SCHEDULE SLOTS */
+    .schedule-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slot-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      display: grid;
+      grid-template-columns: 130px 1fr auto;
+      align-items: center;
+      gap: 14px;
+      transition: var(--transition);
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      .slot-card {
+        grid-template-columns: 1fr auto;
+        gap: 8px;
+      }
+      .slot-time {
+        grid-column: 1 / -1;
+      }
+    }
+
+    .slot-card:hover {
+      border-color: #475569;
+      background: var(--bg-card-hover);
+    }
+
+    .slot-card.is-current {
+      border-color: #38bdf8;
+      background: #1e2947;
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.15);
+    }
+
+    .slot-card.completed {
+      opacity: 0.55;
+    }
+
+    .slot-card.completed .slot-title {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    .slot-time {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #cbd5e1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .slot-details {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .slot-header-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .slot-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: #f8fafc;
+    }
+
+    .slot-desc {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      line-height: 1.35;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .badge-bvi { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.3); }
+    .badge-cf { background: rgba(56, 189, 248, 0.2); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-math { background: rgba(251, 191, 36, 0.2); color: #fde047; border: 1px solid rgba(251, 191, 36, 0.3); }
+    .badge-rus { background: rgba(248, 113, 113, 0.2); color: #fca5a5; border: 1px solid rgba(248, 113, 113, 0.3); }
+    .badge-ege { background: rgba(168, 85, 247, 0.2); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-rest { background: rgba(52, 211, 153, 0.2); color: #6ee7b7; border: 1px solid rgba(52, 211, 153, 0.3); }
+    .badge-school { background: rgba(100, 116, 139, 0.2); color: #cbd5e1; border: 1px solid rgba(100, 116, 139, 0.3); }
+
+    .checkbox-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      border: 2px solid #475569;
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: var(--transition);
+      color: transparent;
+      font-size: 16px;
+    }
+
+    .checkbox-btn:hover {
+      border-color: #38bdf8;
+    }
+
+    .checkbox-btn.checked {
+      background: #10b981;
+      border-color: #10b981;
+      color: #fff;
+    }
+
+    /* EGE TRACKER SECTION */
+    .panel {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .ege-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+    }
+
+    .ege-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .ege-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .ege-subject {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .ege-difficulty {
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 700;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .diff-high { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+    .diff-med { background: rgba(245, 158, 11, 0.2); color: #fcd34d; }
+    .diff-low { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+
+    .ege-checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.85rem;
+    }
+
+    .ege-checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      color: #cbd5e1;
+    }
+
+    .ege-checklist input[type="checkbox"] {
+      margin-top: 3px;
+      accent-color: #38bdf8;
+    }
+
+    /* CODEFORCES ERROR TRACKER */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .input-text, select, textarea {
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 9px 12px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .input-text:focus, select:focus, textarea:focus {
+      border-color: #38bdf8;
+    }
+
+    .cf-form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .cf-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .error-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .error-meta {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .error-tag {
+      font-size: 0.72rem;
+      background: rgba(239, 68, 68, 0.15);
+      color: #fca5a5;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* MODAL */
+    .modal-backdrop {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .modal-backdrop.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-box {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      max-width: 620px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .modal-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .close-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* RESOURCE LINKS */
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .link-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      transition: var(--transition);
+    }
+
+    .link-card:hover {
+      border-color: #38bdf8;
+      transform: translateY(-2px);
+    }
+
+    .link-name {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+    }
+
+    .link-desc {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+    }
+
+    /* FULLSCREEN FOCUS OVERLAY */
+    .focus-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #060911;
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .focus-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .focus-timer-large {
+      font-size: clamp(4.5rem, 14vw, 11rem);
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      color: #38bdf8;
+      line-height: 1;
+      margin: 16px 0;
+      text-shadow: 0 0 35px rgba(56, 189, 248, 0.3);
+    }
+
+    .focus-task-name {
+      font-size: 1.6rem;
+      font-weight: 700;
+      text-align: center;
+      color: #fff;
+      max-width: 800px;
+    }
+
+    .focus-task-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 6px;
+      max-width: 600px;
+    }
+
+    .btn-exit-focus {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+    }
+
+    .d-none { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div>
+        <div class="brand-title">БВИ & Олимпиадный трекер</div>
+        <div class="brand-sub">Стратегия 90+ ЕГЭ & Защита от перегрузок</div>
+      </div>
+    </div>
+
+    <div class="clock-widget">
+      <div id="liveClock" class="clock-time">00:00:00</div>
+      <div id="liveDate" class="clock-date">Загрузка...</div>
+    </div>
+
+    <div class="nav-tabs">
+      <button class="nav-btn active" onclick="switchMainTab('schedule')">Расписание</button>
+      <button class="nav-btn" onclick="switchMainTab('ege')">ЕГЭ 90+</button>
+      <button class="nav-btn" onclick="switchMainTab('cf-mistakes')">Ошибки Codeforces</button>
+      <button class="nav-btn" onclick="openFlexModal()">Протокол гибкости</button>
+      <button class="nav-btn" style="border-color: #38bdf8; color: #38bdf8;" onclick="startFocusMode()">Фокус-режим</button>
+      <button class="nav-btn" style="border-color: #34d399; color: #34d399;" onclick="openPhoneModal()">На телефон</button>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main>
+
+    <!-- HERO: CURRENT ACTIVE SLOT -->
+    <section class="hero-current" id="heroSlot">
+      <div class="hero-top">
+        <div>
+          <div class="hero-label">
+            <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#38bdf8;"></span>
+            Текущее занятие прямо сейчас
+          </div>
+          <div class="hero-title" id="currentSlotTitle">Определение текущего слота...</div>
+          <div style="font-size: 0.88rem; color: var(--text-muted); margin-top: 3px;" id="currentSlotDesc">Загрузка данных...</div>
+        </div>
+        <div class="hero-timer-box">
+          <div class="hero-timer" id="currentCountdown">--:--</div>
+          <div class="hero-timer-sub" id="currentInterval">--:-- – --:--</div>
+        </div>
+      </div>
+
+      <div class="progress-bar-container">
+        <div class="progress-bar-fill" id="slotProgressBar"></div>
+      </div>
+
+      <div class="hero-footer">
+        <div class="hero-next" id="nextSlotText">Следующее: ...</div>
+        <div class="hero-actions">
+          <button class="btn btn-outline" onclick="toggleCurrentCompleted()">Отметить выполненным</button>
+          <button class="btn btn-primary" onclick="startFocusMode()">Войти в глубокий фокус</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 1: SCHEDULE VIEW -->
+    <div id="tab-schedule">
+      <div class="day-selector" id="daySelector">
+        <!-- populated by JS -->
+      </div>
+
+      <div class="schedule-container" id="slotsContainer">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- TAB 2: EGE 90+ PREPARATION -->
+    <div id="tab-ege" class="d-none">
+      <div class="panel">
+        <div class="panel-title">
+          <span>Стратегия ЕГЭ на 90+ баллов по предметам</span>
+          <span style="font-size: 0.82rem; font-weight: 500; color: #38bdf8;">Целевая сумма: 270–280+ баллов</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Предметы распределены по специфике подготовки. Олимпиадная база закрывает вторую часть математики и информатики, но ЕГЭ требует безупречной автоматизации критериев и безошибочного решения первой части.
+        </p>
+
+        <div class="ege-grid">
+
+          <!-- ПРОФИЛЬНАЯ МАТЕМАТИКА -->
+          <div class="ege-card">
+            <div class="ege-card-header">
+              <div class="ege-subject">Профильная математика</div>
+              <span class="ege-difficulty diff-high">Сложность: Высокая</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">
+              Основная ловушка — потеря баллов на оформлении №18 (параметры) и №14/17 (геометрия). Олимпиадные методы дают преимущество в №19 (теория чисел).
+            </p>
+            <ul class="ege-checklist" id="ege-checklist-math">
+              <li><label><input type="checkbox" data-subject="math" data-task="part1"> 1-я часть (№1–12): отработка до автоматизма (макс. 30 мин)</label></li>
+              <li><label><input type="checkbox" data-subject="math" data-task="task13"> №13: Тригонометрические и смешанные уравнения</label></li>
+              <li><label><input type="checkbox" data-subject="math" data-task="task15"> №15: Логарифмические и показательные неравенства</label></li>
+              <li><label><input type="checkbox" data-subject="math" data-task="task16"> №16: Экономическая задача (дифференцированные платежи)</label></li>
+              <li><label><input type="checkbox" data-subject="math" data-task="task18"> №18: Задачи с параметром (графический и аналитический методы)</label></li>
+              <li><label><input type="checkbox" data-subject="math" data-task="task19"> №19: Числа и их свойства (олимпиадная база)</label></li>
+              <li><label><input type="checkbox" data-subject="math" data-task="geom"> №14 и №17: Стереометрия и планиметрия (координатный метод)</label></li>
+            </ul>
+          </div>
+
+          <!-- РУССКИЙ ЯЗЫК -->
+          <div class="ege-card">
+            <div class="ege-card-header">
+              <div class="ege-subject">Русский язык</div>
+              <span class="ege-difficulty diff-high">Коварный: Высокая цена ошибки</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">
+              Каждый первичный балл стоит 2–3 вторичных. Нужно натренировать алгоритмы тестовой части и структуру сочинения (К1–К12).
+            </p>
+            <ul class="ege-checklist" id="ege-checklist-rus">
+              <li><label><input type="checkbox" data-subject="rus" data-task="ortho"> Орфография (№9–15): чередования, приставки, суффиксы</label></li>
+              <li><label><input type="checkbox" data-subject="rus" data-task="punct"> Пунктуация (№16–21): сложносочиненные, обороты, тире/двоеточие</label></li>
+              <li><label><input type="checkbox" data-subject="rus" data-task="norms"> Языковые нормы (№4–8): ударения, паронимы, синтаксис</label></li>
+              <li><label><input type="checkbox" data-subject="rus" data-task="text"> Работа с текстом (№1–3, №22–26): средства выразительности</label></li>
+              <li><label><input type="checkbox" data-subject="rus" data-task="essay-str"> Сочинение: формулировка проблемы и авторской позиции</label></li>
+              <li><label><input type="checkbox" data-subject="rus" data-task="essay-comm"> Сочинение: двухэлементный комментарий и связка-анализ</label></li>
+            </ul>
+          </div>
+
+          <!-- ИНФОРМАТИКА (КЕГЭ) -->
+          <div class="ege-card">
+            <div class="ege-card-header">
+              <div class="ege-subject">Информатика (КЕГЭ)</div>
+              <span class="ege-difficulty diff-med">Сложность: Средняя (для олимпиадника)</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">
+              Самый прогнозируемый предмет на 95–100 баллов. Практика на Codeforces автоматически закрывает №26 и №27. Требуется отточить шаблоны на Python.
+            </p>
+            <ul class="ege-checklist" id="ege-checklist-inf">
+              <li><label><input type="checkbox" data-subject="inf" data-task="basic"> №1–23: Быстрое решение скриптами на Python</label></li>
+              <li><label><input type="checkbox" data-subject="inf" data-task="task24"> №24: Обработка строковых файлов и регулярные выражения</label></li>
+              <li><label><input type="checkbox" data-subject="inf" data-task="task25"> №25: Теория чисел, маски делителей и быстрый перебор</label></li>
+              <li><label><input type="checkbox" data-subject="inf" data-task="task26"> №26: Сортировки, жадные алгоритмы и контейнеры</label></li>
+              <li><label><input type="checkbox" data-subject="inf" data-task="task27"> №27: Эффективные алгоритмы O(N), префиксные суммы и динамика</label></li>
+              <li><label><input type="checkbox" data-subject="inf" data-task="fulltest"> Полный прогон варианта на скорость (лимит 2.5 часа)</label></li>
+            </ul>
+          </div>
+
+          <!-- АНГЛИЙСКИЙ ЯЗЫК -->
+          <div class="ege-card">
+            <div class="ege-card-header">
+              <div class="ege-subject">Английский язык</div>
+              <span class="ege-difficulty diff-low">Приоритет: Поддерживающий</span>
+            </div>
+            <p style="font-size: 0.8rem; color: var(--text-muted);">
+              Уровень уже высокий. Задача — не терять беглость и пополнять технический вокабуляр без перегрузки школьной сетки.
+            </p>
+            <ul class="ege-checklist" id="ege-checklist-eng">
+              <li><label><input type="checkbox" data-subject="eng" data-task="reading"> Чтение технических статей / документации PyTorch & PapersWithCode</label></li>
+              <li><label><input type="checkbox" data-subject="eng" data-task="listening"> Просмотр лекций MIT/Stanford/3Blue1Brown в оригинале</label></li>
+              <li><label><input type="checkbox" data-subject="eng" data-task="vocab"> Фиксация 10 новых терминов в неделю</label></li>
+            </ul>
+          </div>
+
+        </div>
+
+        <!-- ПРОБНИКИ ТРЕКЕР -->
+        <div style="border-top: 1px solid var(--border); padding-top: 18px; margin-top: 6px;">
+          <h3 style="font-size: 1.05rem; color: #fff; margin-bottom: 10px;">Журнал пробников (ЕГЭ)</h3>
+          <div class="cf-form-grid">
+            <div class="form-group">
+              <label>Предмет</label>
+              <select id="mockSubject">
+                <option value="Математика">Профильная математика</option>
+                <option value="Русский язык">Русский язык</option>
+                <option value="Информатика">Информатика</option>
+                <option value="Английский">Английский язык</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Балл (вторичный)</label>
+              <input type="number" id="mockScore" class="input-text" placeholder="например, 88" min="0" max="100">
+            </div>
+            <div class="form-group">
+              <label>Дата сдачи</label>
+              <input type="date" id="mockDate" class="input-text">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 8px;">
+            <label>Ошибки и темы для повторения</label>
+            <input type="text" id="mockNotes" class="input-text" placeholder="например, потерял балл на ОДЗ в №15 и описка в №18">
+          </div>
+          <button class="btn btn-primary" style="margin-top: 10px;" onclick="saveMockResult()">Сохранить результат пробника</button>
+
+          <div id="mockResultsList" style="margin-top: 14px; display: flex; flex-direction: column; gap: 8px;">
+            <!-- list of mocks -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- TAB 3: CODEFORCES MISTAKE LOG -->
+    <div id="tab-cf-mistakes" class="d-none">
+      <div class="panel">
+        <div class="panel-title">
+          <span>Журнал ошибок Codeforces & Алгоритмов</span>
+          <span style="font-size: 0.82rem; color: #38bdf8;">Анализ узких мест</span>
+        </div>
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          Согласно правилу подготовки, разбор задачи обязательно фиксирует причину неудачи. Это исключает повторение одних и тех же ошибок на олимпиадах.
+        </p>
+
+        <div style="background: var(--bg-card); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border);">
+          <div class="cf-form-grid">
+            <div class="form-group">
+              <label>Задача (код / название / ссылка)</label>
+              <input type="text" id="cfProblem" class="input-text" placeholder="например, 2101B или Div.3 C">
+            </div>
+            <div class="form-group">
+              <label>Тип ошибки</label>
+              <select id="cfErrorType">
+                <option value="Не понял идею алгоритма">1. Не понял идею алгоритма</option>
+                <option value="Не заметил математическое наблюдение">2. Не заметил мат. наблюдение</option>
+                <option value="Ошибка реализации">3. Ошибка реализации (баг / TLE / WA)</option>
+                <option value="Не учёл граничный случай">4. Не учёл граничный случай</option>
+                <option value="Не хватило времени">5. Не хватило времени</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label>Требуемая тема / алгоритм</label>
+              <input type="text" id="cfTopic" class="input-text" placeholder="например: Префиксные суммы, Графы, ДП">
+            </div>
+          </div>
+          <div class="form-group" style="margin-top: 10px;">
+            <label>Разбор и выводы (как нужно было думать)</label>
+            <textarea id="cfNotes" rows="2" placeholder="Зафиксируй ключевое наблюдение, которое помогло бы решить задачу на контесте..."></textarea>
+          </div>
+          <button class="btn btn-primary" style="margin-top: 10px;" onclick="addCfMistake()">Добавить в журнал ошибок</button>
+        </div>
+
+        <div style="margin-top: 8px;">
+          <h4 style="font-size: 0.95rem; color: #fff; margin-bottom: 8px;">Сохраненные ошибки:</h4>
+          <div id="cfMistakesList" style="display: flex; flex-direction: column; gap: 8px;">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- QUICK LINKS SECTION -->
+    <section class="panel">
+      <div class="panel-title">
+        <span>Быстрый запуск платформ и тренажеров</span>
+      </div>
+      <div class="links-grid">
+        <a href="https://codeforces.com/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #38bdf8;">Codeforces</div>
+          <div class="link-desc">Контесты, Div.3 / Div.2, архив задач</div>
+        </a>
+        <a href="https://contest.yandex.ru/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #fbbf24;">Яндекс Контест</div>
+          <div class="link-desc">Архивы олимпиад и тренировок</div>
+        </a>
+        <a href="https://cses.fi/problemset/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #34d399;">CSES Problem Set</div>
+          <div class="link-desc">Золотой стандарт олимпиадных тем</div>
+        </a>
+        <a href="https://cp-algorithms.com/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #a855f7;">CP-Algorithms</div>
+          <div class="link-desc">Теория алгоритмов с реализацией</div>
+        </a>
+        <a href="https://usaco.guide/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #60a5fa;">USACO Guide</div>
+          <div class="link-desc">Пошаговый курс алгоритмов от Bronze до Platinum</div>
+        </a>
+        <a href="https://kpolyakov.spb.ru/school/ege.htm" target="_blank" class="link-card">
+          <div class="link-name" style="color: #ec4899;">КЕГЭ (Поляков)</div>
+          <div class="link-desc">Генератор и разборы сложных задач 24–27</div>
+        </a>
+        <a href="https://sdamgia.ru/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #f87171;">Решу ЕГЭ</div>
+          <div class="link-desc">Банк задач по математике и русскому</div>
+        </a>
+        <a href="https://colab.research.google.com/" target="_blank" class="link-card">
+          <div class="link-name" style="color: #fb923c;">Google Colab</div>
+          <div class="link-desc">Jupyter ноутбуки с GPU для ML & Vision</div>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: PROTOCOL OF FLEXIBILITY -->
+  <div class="modal-backdrop" id="flexModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Протокол гибкости: правила при сбоях</div>
+        <button class="close-btn" onclick="closeFlexModal()">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; line-height: 1.45;">
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #ef4444;">
+          <strong style="color: #fca5a5; font-size: 0.95rem;">Правило №1. Если сорвался график</strong>
+          <p style="margin-top: 5px; color: #cbd5e1;">Никакой ночной учебы за счет сна. Порядок сокращения:</p>
+          <ol style="margin-left: 18px; margin-top: 4px; color: var(--text-muted);">
+            <li>Портфолио переносится на следующую неделю.</li>
+            <li>Английский сокращается до 30 минут.</li>
+            <li>Олимпиадный русский или дополнительный математический блок переносятся.</li>
+            <li>Дополнительные задачи Codeforces откладываются на следующий тренировочный день.</li>
+            <li><strong style="color: #fff;">Задания текущих профильных курсов (БВИ) сохраняют абсолютный приоритет.</strong></li>
+          </ol>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+          <strong style="color: #fcd34d; font-size: 0.95rem;">Правило №2. Если навалилась сильная усталость</strong>
+          <p style="margin-top: 5px; color: #cbd5e1;">
+            При падении концентрации отменяется вечерний необязательный блок. Замени сложную задачу легким просмотром конспекта или сразу перейди к отдыху. <strong>Сон 23:00–07:00 неприкосновенен.</strong>
+          </p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #38bdf8;">
+          <strong style="color: #7dd3fc; font-size: 0.95rem;">Правило №3. Если затянулся контест</strong>
+          <p style="margin-top: 5px; color: #cbd5e1;">
+            У контеста жесткий лимит — 3 часа. Если задача не поддается, зафиксируй идею, закрой контест и выдели время на разбор позже. Не отбирай часы у моделирования и ML.
+          </p>
+        </div>
+
+        <div style="background: rgba(37, 99, 235, 0.15); padding: 12px; border-radius: 8px; border: 1px solid #3b82f6;">
+          <strong style="color: #93c5fd;">Неприкосновенные зоны расписания:</strong>
+          <ul style="margin-left: 18px; margin-top: 4px; color: #cbd5e1; font-size: 0.85rem;">
+            <li>Сон: 23:00–07:00 (8 часов ежедневно)</li>
+            <li>Суббота 13:00–17:00: друзья и прогулки</li>
+            <li>Пятница 20:00–21:00: спорт и восстановление</li>
+            <li>Дедлайны профильных университетских курсов</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div style="text-align: right; margin-top: 6px;">
+        <button class="btn btn-primary" onclick="closeFlexModal()">Понятно</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: PHONE SETUP (PWA) -->
+  <div class="modal-backdrop" id="phoneModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Как открыть и установить на телефон</div>
+        <button class="close-btn" onclick="closePhoneModal()">&times;</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 12px; font-size: 0.9rem; line-height: 1.45;">
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #34d399;">
+          <strong style="color: #6ee7b7; font-size: 0.95rem;">Способ 1. Запуск через домашний Wi-Fi (без интернета)</strong>
+          <p style="margin-top: 5px; color: #cbd5e1;">
+            1. Запусти на компьютере <code>python run_app.py</code>.<br>
+            2. Подключи телефон к тому же домашнему Wi-Fi.<br>
+            3. Введи сетевой адрес из консоли компьютера (например, <code>http://192.168.x.x:5050</code>) в браузере телефона.
+          </p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #38bdf8;">
+          <strong style="color: #7dd3fc; font-size: 0.95rem;">Способ 2. Установка как приложения (PWA)</strong>
+          <p style="margin-top: 5px; color: #cbd5e1;">Приложение работает офлайн без магазинов приложений:</p>
+          <ul style="margin-left: 18px; margin-top: 4px; color: var(--text-muted);">
+            <li><strong style="color:#fff;">Android (Chrome):</strong> нажми три точки в правом верхнем углу &rarr; <em>«Установить приложение»</em> или <em>«Добавить на главный экран»</em>.</li>
+            <li><strong style="color:#fff;">iPhone (Safari):</strong> нажми кнопку <em>«Поделиться»</em> (квадрат со стрелкой вверх) &rarr; выбери <em>«На экран «Домой»»</em>.</li>
+          </ul>
+          <p style="margin-top: 5px; color: #94a3b8; font-size: 0.82rem;">После добавления иконка появится на рабочем столе телефона, приложение будет открываться во весь экран и работать без рамок браузера.</p>
+        </div>
+
+        <div style="background: var(--bg-card); padding: 12px; border-radius: 8px; border-left: 4px solid #a855f7;">
+          <strong style="color: #d8b4fe; font-size: 0.95rem;">Способ 3. Бесплатная публикация в интернет (доступ отовсюду)</strong>
+          <p style="margin-top: 5px; color: #cbd5e1;">
+            Чтобы открывать трекер вне дома через мобильную сеть, загрузи файлы папки в репозиторий на GitHub и включи <strong>GitHub Pages</strong> в настройках. Получится постоянная ссылка вида <code>https://твой-логин.github.io/focus_tracker</code>.
+          </p>
+        </div>
+      </div>
+      
+      <div style="text-align: right; margin-top: 6px;">
+        <button class="btn btn-primary" onclick="closePhoneModal()">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FULLSCREEN FOCUS ZEN OVERLAY -->
+  <div class="focus-overlay" id="focusOverlay">
+    <button class="btn btn-outline btn-exit-focus" onclick="exitFocusMode()">✕ Выйти из фокуса</button>
+    <div style="font-size: 0.95rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8;">Глубокая концентрация</div>
+    <div class="focus-timer-large" id="focusZenTimer">25:00</div>
+    <div class="focus-task-name" id="focusZenTitle">Текущая задача</div>
+    <div class="focus-task-desc" id="focusZenDesc">Описание задачи и фокус внимания</div>
+
+    <div style="display: flex; gap: 10px; margin-top: 24px;">
+      <button class="btn btn-outline" onclick="adjustZenTimer(-5)">-5 мин</button>
+      <button class="btn btn-primary" id="zenToggleBtn" onclick="toggleZenTimer()">Пауза</button>
+      <button class="btn btn-outline" onclick="adjustZenTimer(5)">+5 мин</button>
+    </div>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+
+    // --- SCHEDULE DATA ---
+    const SCHEDULE = {
+      1: {
+        name: "Понедельник",
+        subtitle: "Математика и русский язык (Главный учебный день)",
+        slots: [
+          { start: "07:00", end: "07:30", title: "Подъём, гигиена, завтрак", desc: "Утренний запуск дня, настройка", badge: "Отдых", type: "rest" },
+          { start: "07:30", end: "08:30", title: "Дорога в школу", desc: "Аудиокнига, подкаст или спокойный переход", badge: "Дорога", type: "school" },
+          { start: "08:30", end: "16:00", title: "Школа", desc: "Уроки. Домашние задания выполняются строго на переменах. Обед.", badge: "Школа", type: "school" },
+          { start: "16:00", end: "16:45", title: "Дорога домой, перекус", desc: "Возвращение, разгрузка головы", badge: "Дорога", type: "rest" },
+          { start: "16:45", end: "17:30", title: "Полноценный отдых", desc: "Прогулка или сон без экранов для перезагрузки внимания", badge: "Восстановление", type: "rest" },
+          { start: "17:30", end: "19:00", title: "Вузовская математика: задания лекции", desc: "Выполнение заданий лекции, разбор сложных задач и доказательств", badge: "БВИ №1", type: "bvi" },
+          { start: "19:00", end: "19:45", title: "Ужин, отдых", desc: "Прием пищи, переключение внимания", badge: "Отдых", type: "rest" },
+          { start: "19:45", end: "20:45", title: "Олимпиадный русский + Тест ЕГЭ", desc: "Грамматика, лексика, разбор сложных заданий орфографии/пунктуации (№9–21)", badge: "Олимпиады / ЕГЭ 90+", type: "rus" },
+          { start: "20:45", end: "21:15", title: "Перерыв", desc: "Чай, легкая разминка", badge: "Отдых", type: "rest" },
+          { start: "21:15", end: "21:45", title: "Проверка решений по математике", desc: "Анализ ошибок, оформление и закрепление конспекта", badge: "БВИ №1", type: "bvi" },
+          { start: "21:45", end: "23:00", title: "Свободное время, подготовка ко сну", desc: "Отключение гаджетов за 30 мин до сна", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Полное восстановление сил. Залог продуктивности всей недели", badge: "Сон", type: "rest" }
+        ]
+      },
+      2: {
+        name: "Вторник",
+        subtitle: "Вузовская математика и алгоритмы (Приоритет БВИ + Codeforces)",
+        slots: [
+          { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Утренний подъем без спешки", badge: "Отдых", type: "rest" },
+          { start: "07:30", end: "08:30", title: "Дорога в школу", desc: "Дорога", badge: "Дорога", type: "school" },
+          { start: "08:30", end: "15:00", title: "Школа", desc: "Уроки, школьное ДЗ на переменах", badge: "Школа", type: "school" },
+          { start: "15:00", end: "16:15", title: "Дорога, обед, отдых", desc: "Восстановление сил после уроков", badge: "Отдых", type: "rest" },
+          { start: "16:15", end: "17:00", title: "Подготовка и дорога на лекцию", desc: "Настройка на профильный предмет", badge: "Дорога", type: "school" },
+          { start: "17:00", end: "18:30", title: "Лекция: профильная математика для вузов", desc: "Максимальное внимание. Запись доказательств и ключевых теорем", badge: "БВИ №1", type: "bvi" },
+          { start: "18:30", end: "19:15", title: "Дорога домой, ужин", desc: "Перекус, отдых", badge: "Отдых", type: "rest" },
+          { start: "19:15", end: "20:15", title: "Разбор лекции: конспект и теоремы", desc: "Восстановление доказательств по свежей памяти, разбор 1–2 задач", badge: "БВИ №1", type: "bvi" },
+          { start: "20:15", end: "20:45", title: "Перерыв", desc: "Разгрузка глаз и разминка", badge: "Отдых", type: "rest" },
+          { start: "20:45", end: "21:45", title: "Codeforces: задачи Div. 3", desc: "Реализация и проверка алгоритмов. Разбор структуры задач КЕГЭ №26–27", badge: "Информатика №2", type: "cf" },
+          { start: "21:45", end: "23:00", title: "Отдых, подготовка ко сну", desc: "Спокойный вечер", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Неприкосновенный восстановительный сон", badge: "Сон", type: "rest" }
+        ]
+      },
+      3: {
+        name: "Среда",
+        subtitle: "Математическое моделирование и ML (День профильных курсов)",
+        slots: [
+          { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Утренний распорядок", badge: "Отдых", type: "rest" },
+          { start: "07:30", end: "08:30", title: "Дорога в школу", desc: "Дорога", badge: "Дорога", type: "school" },
+          { start: "08:30", end: "15:00", title: "Школа", desc: "Уроки, решение школьного ДЗ", badge: "Школа", type: "school" },
+          { start: "15:00", end: "16:15", title: "Дорога, обед, отдых", desc: "Перезагрузка", badge: "Отдых", type: "rest" },
+          { start: "16:15", end: "17:00", title: "Подготовка и дорога", desc: "Подготовка к вечерней связке курсов", badge: "Дорога", type: "school" },
+          { start: "17:00", end: "18:30", title: "Лекция: математическое моделирование", desc: "Численные методы, дифференциальные уравнения, аппроксимация", badge: "БВИ №1", type: "bvi" },
+          { start: "18:30", end: "19:30", title: "Ужин, дорога, переключение", desc: "Прием пищи, настройка на практикум по ML", badge: "Отдых", type: "rest" },
+          { start: "19:30", end: "20:30", title: "Практикум: ML, Data Science & Computer Vision", desc: "Код, пайплайны, сверточные сети, практические эксперименты", badge: "БВИ №1", type: "bvi" },
+          { start: "20:30", end: "21:15", title: "Возвращение, отдых", desc: "Разгрузка после двух сложных пар", badge: "Отдых", type: "rest" },
+          { start: "21:15", end: "21:45", title: "Краткий конспект практикума", desc: "Фиксация формул, методов и вопросов для семинариста", badge: "БВИ №1", type: "bvi" },
+          { start: "21:45", end: "23:00", title: "Свободное время", desc: "Полный отдых без интеллектуальной нагрузки", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Восстановление", badge: "Сон", type: "rest" }
+        ]
+      },
+      4: {
+        name: "Четверг",
+        subtitle: "Алгоритмы и олимпиадная математика (Самостоятельная подготовка)",
+        slots: [
+          { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Подъем", badge: "Отдых", type: "rest" },
+          { start: "07:30", end: "08:30", title: "Дорога в школу", desc: "Дорога", badge: "Дорога", type: "school" },
+          { start: "08:30", end: "15:00", title: "Школа", desc: "Уроки, школьное ДЗ на переменах", badge: "Школа", type: "school" },
+          { start: "15:00", end: "15:45", title: "Дорога, перекус", desc: "Возвращение домой", badge: "Отдых", type: "rest" },
+          { start: "15:45", end: "16:00", title: "Перерыв", desc: "Короткая пауза", badge: "Отдых", type: "rest" },
+          { start: "16:00", end: "17:30", title: "Олимпиадная информатика: алгоритмы", desc: "Графы (DFS/BFS), динамическое программирование, бинарный поиск, разбор №27 КЕГЭ", badge: "Информатика №2", type: "cf" },
+          { start: "17:30", end: "18:00", title: "Ужин и отдых", desc: "Прием пищи", badge: "Отдых", type: "rest" },
+          { start: "18:00", end: "18:45", title: "Олимпиадная математика + Параметры №18", desc: "Комбинаторика, теория чисел, отработка методов решения задач с параметром", badge: "Математика №3", type: "math" },
+          { start: "18:45", end: "19:30", title: "Дорога, подготовка", desc: "Сборы", badge: "Дорога", type: "school" },
+          { start: "19:30", end: "22:00", title: "Фиксированная занятость", desc: "Неприкосновенный слот личных дел", badge: "Занятость", type: "school" },
+          { start: "22:00", end: "23:00", title: "Возвращение, гигиена, спокойный отдых", desc: "Подготовка ко сну", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Сон", badge: "Сон", type: "rest" }
+        ]
+      },
+      5: {
+        name: "Пятница",
+        subtitle: "Математика и спорт (День закрепления)",
+        slots: [
+          { start: "07:00", end: "07:30", title: "Подъём, завтрак", desc: "Подъем", badge: "Отдых", type: "rest" },
+          { start: "07:30", end: "08:30", title: "Дорога в школу", desc: "Дорога", badge: "Дорога", type: "school" },
+          { start: "08:30", end: "16:00", title: "Школа", desc: "Завершение школьной учебной недели", badge: "Школа", type: "school" },
+          { start: "16:00", end: "17:00", title: "Дорога, перекус, подготовка", desc: "Подготовка к практическому занятию", badge: "Отдых", type: "rest" },
+          { start: "17:00", end: "18:30", title: "Практика: математика для вузов", desc: "Решение задач по матанализу и линейной алгебре, разбор у доски", badge: "БВИ №1", type: "bvi" },
+          { start: "18:30", end: "20:00", title: "Ужин, дорога, отдых", desc: "Подготовка к тренировке", badge: "Отдых", type: "rest" },
+          { start: "20:00", end: "21:00", title: "Спорт / Тренировка", desc: "Физическая активность для снятия статического напряжения", badge: "Спорт", type: "rest" },
+          { start: "21:00", end: "21:45", title: "Душ, лёгкий ужин", desc: "Никакой учебы после тренировки", badge: "Восстановление", type: "rest" },
+          { start: "21:45", end: "23:00", title: "Отдых", desc: "Фильмы, книги, расслабление", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Крепкий сон", badge: "Сон", type: "rest" }
+        ]
+      },
+      6: {
+        name: "Суббота",
+        subtitle: "Алгоритмы, английский и друзья (Учеба только утром)",
+        slots: [
+          { start: "07:00", end: "08:00", title: "Подъём, завтрак, утренние дела", desc: "Спокойное неспешное субботнее утро", badge: "Отдых", type: "rest" },
+          { start: "08:00", end: "09:00", title: "Свободное время, прогулка", desc: "Свежий воздух", badge: "Отдых", type: "rest" },
+          { start: "09:00", end: "10:30", title: "Codeforces: задачи по текущей теме", desc: "Решение задач дивизиона 3/2, закрепление алгоритмических структур", badge: "Информатика №2", type: "cf" },
+          { start: "10:30", end: "11:00", title: "Перерыв", desc: "Чай, пауза", badge: "Отдых", type: "rest" },
+          { start: "11:00", end: "12:00", title: "Английский: чтение статьи / документации", desc: "Поддержание уровня: статьи по ML, документация, технический текст", badge: "Английский", type: "rest" },
+          { start: "12:00", end: "13:00", title: "Обед, сборы, дорога", desc: "Подготовка к встрече с друзьями", badge: "Отдых", type: "rest" },
+          { start: "13:00", end: "17:00", title: "Встречи с друзьями", desc: "Неприкосновенный отдых, социализация, прогулки, отключение от учебы", badge: "Друзья", type: "rest" },
+          { start: "17:00", end: "18:00", title: "Возвращение, отдых", desc: "Дорога домой", badge: "Отдых", type: "rest" },
+          { start: "18:00", end: "19:00", title: "Ужин", desc: "Прием пищи", badge: "Отдых", type: "rest" },
+          { start: "19:00", end: "22:00", title: "Полностью свободное время", desc: "Хобби, игры, сериалы — время без угрызений совести", badge: "Отдых", type: "rest" },
+          { start: "22:00", end: "23:00", title: "Подготовка ко сну", desc: "Спокойный режим", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Сон перед воскресным контестом", badge: "Сон", type: "rest" }
+        ]
+      },
+      0: {
+        name: "Воскресенье",
+        subtitle: "Главная олимпиадная тренировка (Фокус на контесте)",
+        slots: [
+          { start: "07:00", end: "08:00", title: "Подъём, завтрак", desc: "Плотный завтрак перед умственной нагрузкой", badge: "Отдых", type: "rest" },
+          { start: "08:00", end: "08:45", title: "Прогулка, подготовка места", desc: "Проветрить комнату, приготовить воду и черновики", badge: "Отдых", type: "rest" },
+          { start: "08:45", end: "09:00", title: "Настройка среды, выбор контеста", desc: "Выбор виртуального раунда Codeforces / Яндекс Контеста", badge: "Подготовка", type: "cf" },
+          { start: "09:00", end: "12:00", title: "Большой олимпиадный контест", desc: "3 часа спортивного программирования. Пауза 5 мин после 90 минут разрешена", badge: "Информатика №2", type: "cf" },
+          { start: "12:00", end: "13:00", title: "Обед, полноценный отдых", desc: "Обед, прогулка, разгрузка глаз", badge: "Отдых", type: "rest" },
+          { start: "13:00", end: "14:00", title: "Разбор контеста и ошибок", desc: "Анализ нерешенных задач, просмотр решений других участников, запись в журнал ошибок", badge: "Информатика №2", type: "cf" },
+          { start: "14:00", end: "14:30", title: "Перерыв, прогулка", desc: "Пауза на свежем воздухе", badge: "Отдых", type: "rest" },
+          { start: "14:30", end: "15:30", title: "Математическое моделирование: задания", desc: "Вычислительные методы, домашние задания, проверка моделей", badge: "БВИ №1", type: "bvi" },
+          { start: "15:30", end: "15:45", title: "Перерыв", desc: "Короткая пауза", badge: "Отдых", type: "rest" },
+          { start: "15:45", end: "16:45", title: "ML / Data Science: задания практикума", desc: "Эксперименты с моделями, реализация изученных алгоритмов в Jupyter", badge: "БВИ №1", type: "bvi" },
+          { start: "16:45", end: "17:15", title: "Портфолио: проект, GitHub", desc: "Оформление README, заливка кода решенных задач и мини-проектов", badge: "Портфолио №4", type: "rest" },
+          { start: "17:15", end: "18:00", title: "Ужин", desc: "Прием пищи", badge: "Отдых", type: "rest" },
+          { start: "18:00", end: "18:30", title: "Планирование недели, проверка дедлайнов", desc: "Сверка курсов, олимпиадных регистраций и пробников ЕГЭ", badge: "Планирование", type: "math" },
+          { start: "18:30", end: "22:00", title: "Полностью свободный вечер", desc: "Восстановление сил перед учебной неделей", badge: "Отдых", type: "rest" },
+          { start: "22:00", end: "23:00", title: "Гигиена, подготовка ко сну", desc: "Отбой ровно в 23:00", badge: "Отдых", type: "rest" },
+          { start: "23:00", end: "07:00", title: "Сон (8 часов)", desc: "Сон", badge: "Сон", type: "rest" }
+        ]
+      }
+    };
+
+    let selectedDay = new Date().getDay();
+    let activeSlot = null;
+    let zenTimerInterval = null;
+    let zenSecondsRemaining = 25 * 60;
+    let zenIsRunning = false;
+
+    // --- INITIALIZATION ---
+    function init() {
+      renderDaySelector();
+      renderSlots();
+      updateClock();
+      setInterval(updateClock, 1000);
+      loadEgeChecklist();
+      loadMockResults();
+      loadCfMistakes();
+      bindEgeEvents();
+    }
+
+    // --- CLOCK & CURRENT SLOT TRACKER ---
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString('ru-RU', { hour12: false });
+      const dateStr = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      
+      document.getElementById('liveClock').textContent = timeStr;
+      document.getElementById('liveDate').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+      calculateCurrentSlot(now);
+    }
+
+    function timeToMinutes(str) {
+      const [h, m] = str.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    function calculateCurrentSlot(now) {
+      const todayDay = now.getDay();
+      const dayData = SCHEDULE[todayDay];
+      if (!dayData) return;
+
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+      const currentSeconds = now.getSeconds();
+
+      let currentFound = null;
+      let nextFound = null;
+
+      for (let i = 0; i < dayData.slots.length; i++) {
+        const slot = dayData.slots[i];
+        let startMin = timeToMinutes(slot.start);
+        let endMin = timeToMinutes(slot.end);
+
+        let isInside = false;
+        let totalSlotSec = 0;
+        let elapsedSlotSec = 0;
+
+        if (endMin < startMin) {
+          if (currentMinutes >= startMin || currentMinutes < endMin) {
+            isInside = true;
+            totalSlotSec = ((24 * 60 - startMin) + endMin) * 60;
+            if (currentMinutes >= startMin) {
+              elapsedSlotSec = (currentMinutes - startMin) * 60 + currentSeconds;
+            } else {
+              elapsedSlotSec = ((24 * 60 - startMin) + currentMinutes) * 60 + currentSeconds;
+            }
+          }
+        } else {
+          if (currentMinutes >= startMin && currentMinutes < endMin) {
+            isInside = true;
+            totalSlotSec = (endMin - startMin) * 60;
+            elapsedSlotSec = (currentMinutes - startMin) * 60 + currentSeconds;
+          }
+        }
+
+        if (isInside) {
+          currentFound = { slot, index: i, totalSlotSec, elapsedSlotSec };
+          nextFound = dayData.slots[(i + 1) % dayData.slots.length];
+          break;
+        }
+      }
+
+      if (currentFound) {
+        activeSlot = currentFound.slot;
+        document.getElementById('currentSlotTitle').textContent = currentFound.slot.title;
+        document.getElementById('currentSlotDesc').textContent = currentFound.slot.desc;
+        document.getElementById('currentInterval').textContent = `${currentFound.slot.start} – ${currentFound.slot.end}`;
+
+        const remainingSec = Math.max(0, currentFound.totalSlotSec - currentFound.elapsedSlotSec);
+        const remMin = Math.floor(remainingSec / 60);
+        const remSec = remainingSec % 60;
+        document.getElementById('currentCountdown').textContent = 
+          `${String(remMin).padStart(2, '0')}:${String(remSec).padStart(2, '0')}`;
+
+        const progressPercent = Math.min(100, Math.max(0, (currentFound.elapsedSlotSec / currentFound.totalSlotSec) * 100));
+        document.getElementById('slotProgressBar').style.width = progressPercent.toFixed(1) + '%';
+
+        if (nextFound) {
+          document.getElementById('nextSlotText').innerHTML = `Следующее: <strong>${nextFound.start}</strong> — ${nextFound.title}`;
+        }
+      } else {
+        document.getElementById('currentSlotTitle').textContent = "Свободное время";
+        document.getElementById('currentSlotDesc').textContent = "В текущую минуту нет запланированных слотов";
+        document.getElementById('currentCountdown').textContent = "00:00";
+        document.getElementById('slotProgressBar').style.width = "0%";
+      }
+    }
+
+    // --- DAY SELECTOR & SLOTS RENDERING ---
+    function renderDaySelector() {
+      const container = document.getElementById('daySelector');
+      container.innerHTML = '';
+
+      const dayOrder = [1, 2, 3, 4, 5, 6, 0];
+      const today = new Date().getDay();
+
+      dayOrder.forEach(dayIndex => {
+        const d = SCHEDULE[dayIndex];
+        const tab = document.createElement('div');
+        tab.className = `day-tab ${selectedDay === dayIndex ? 'active' : ''} ${today === dayIndex ? 'is-today' : ''}`;
+        tab.onclick = () => {
+          selectedDay = dayIndex;
+          renderDaySelector();
+          renderSlots();
+        };
+
+        tab.innerHTML = `
+          <div class="day-name">${d.name}</div>
+          <div class="day-sub">${d.subtitle.split('(')[0]}</div>
+        `;
+        container.appendChild(tab);
+      });
+    }
+
+    function getBadgeClass(type) {
+      switch(type) {
+        case 'bvi': return 'badge-bvi';
+        case 'cf': return 'badge-cf';
+        case 'math': return 'badge-math';
+        case 'rus': return 'badge-rus';
+        case 'ege': return 'badge-ege';
+        case 'school': return 'badge-school';
+        default: return 'badge-rest';
+      }
+    }
+
+    function getCompletedDateKey() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    }
+
+    function isSlotCompleted(dayIndex, slotIndex) {
+      const key = `completed_${getCompletedDateKey()}_${dayIndex}_${slotIndex}`;
+      return localStorage.getItem(key) === 'true';
+    }
+
+    function toggleSlotCompleted(dayIndex, slotIndex) {
+      const key = `completed_${getCompletedDateKey()}_${dayIndex}_${slotIndex}`;
+      const current = localStorage.getItem(key) === 'true';
+      localStorage.setItem(key, !current);
+      renderSlots();
+    }
+
+    function toggleCurrentCompleted() {
+      if (!activeSlot) return;
+      const today = new Date().getDay();
+      const daySlots = SCHEDULE[today].slots;
+      const index = daySlots.findIndex(s => s.start === activeSlot.start && s.end === activeSlot.end);
+      if (index !== -1) {
+        toggleSlotCompleted(today, index);
+      }
+    }
+
+    function renderSlots() {
+      const container = document.getElementById('slotsContainer');
+      container.innerHTML = '';
+
+      const dayData = SCHEDULE[selectedDay];
+      const today = new Date().getDay();
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      dayData.slots.forEach((slot, index) => {
+        const completed = isSlotCompleted(selectedDay, index);
+        
+        let isCurrent = false;
+        if (today === selectedDay) {
+          const startMin = timeToMinutes(slot.start);
+          const endMin = timeToMinutes(slot.end);
+          if (endMin < startMin) {
+            isCurrent = currentMinutes >= startMin || currentMinutes < endMin;
+          } else {
+            isCurrent = currentMinutes >= startMin && currentMinutes < endMin;
+          }
+        }
+
+        const card = document.createElement('div');
+        card.className = `slot-card ${isCurrent ? 'is-current' : ''} ${completed ? 'completed' : ''}`;
+        
+        card.innerHTML = `
+          <div class="slot-time">${slot.start} – ${slot.end}</div>
+          <div class="slot-details">
+            <div class="slot-header-line">
+              <span class="slot-title">${slot.title}</span>
+              <span class="badge ${getBadgeClass(slot.type)}">${slot.badge}</span>
+            </div>
+            <div class="slot-desc">${slot.desc}</div>
+          </div>
+          <div>
+            <button class="checkbox-btn ${completed ? 'checked' : ''}" onclick="toggleSlotCompleted(${selectedDay}, ${index})" title="Отметить выполненным">
+              ${completed ? '✓' : ''}
+            </button>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    // --- TABS SWITCHING ---
+    function switchMainTab(tab) {
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      document.getElementById('tab-schedule').classList.add('d-none');
+      document.getElementById('tab-ege').classList.add('d-none');
+      document.getElementById('tab-cf-mistakes').classList.add('d-none');
+
+      if (tab === 'schedule') {
+        document.getElementById('tab-schedule').classList.remove('d-none');
+      } else if (tab === 'ege') {
+        document.getElementById('tab-ege').classList.remove('d-none');
+      } else if (tab === 'cf-mistakes') {
+        document.getElementById('tab-cf-mistakes').classList.remove('d-none');
+      }
+    }
+
+    // --- MODALS ---
+    function openFlexModal() {
+      document.getElementById('flexModal').classList.add('show');
+    }
+
+    function closeFlexModal() {
+      document.getElementById('flexModal').classList.remove('show');
+    }
+
+    function openPhoneModal() {
+      document.getElementById('phoneModal').classList.add('show');
+    }
+
+    function closePhoneModal() {
+      document.getElementById('phoneModal').classList.remove('show');
+    }
+
+    // --- ZEN FOCUS MODE ---
+    function playBeep() {
+      try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(587.33, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.8);
+      } catch(e) {}
+    }
+
+    function startFocusMode() {
+      const overlay = document.getElementById('focusOverlay');
+      overlay.classList.add('active');
+
+      if (activeSlot) {
+        document.getElementById('focusZenTitle').textContent = activeSlot.title;
+        document.getElementById('focusZenDesc').textContent = activeSlot.desc;
+      } else {
+        document.getElementById('focusZenTitle').textContent = "Фокусный блок";
+        document.getElementById('focusZenDesc').textContent = "Концентрация на выбранной задаче";
+      }
+
+      zenSecondsRemaining = 25 * 60;
+      updateZenDisplay();
+      zenIsRunning = true;
+      document.getElementById('zenToggleBtn').textContent = "Пауза";
+
+      clearInterval(zenTimerInterval);
+      zenTimerInterval = setInterval(() => {
+        if (!zenIsRunning) return;
+        if (zenSecondsRemaining > 0) {
+          zenSecondsRemaining--;
+          updateZenDisplay();
+        } else {
+          zenIsRunning = false;
+          playBeep();
+          alert("Фокусный раунд завершен! Сделай короткий перерыв.");
+        }
+      }, 1000);
+    }
+
+    function exitFocusMode() {
+      document.getElementById('focusOverlay').classList.remove('active');
+      clearInterval(zenTimerInterval);
+      zenIsRunning = false;
+    }
+
+    function updateZenDisplay() {
+      const min = Math.floor(zenSecondsRemaining / 60);
+      const sec = zenSecondsRemaining % 60;
+      document.getElementById('focusZenTimer').textContent = 
+        `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    }
+
+    function toggleZenTimer() {
+      zenIsRunning = !zenIsRunning;
+      document.getElementById('zenToggleBtn').textContent = zenIsRunning ? "Пауза" : "Продолжить";
+    }
+
+    function adjustZenTimer(minutes) {
+      zenSecondsRemaining = Math.max(60, zenSecondsRemaining + minutes * 60);
+      updateZenDisplay();
+    }
+
+    // --- EGE CHECKLIST PERSISTENCE ---
+    function bindEgeEvents() {
+      document.querySelectorAll('.ege-checklist input[type="checkbox"]').forEach(box => {
+        box.addEventListener('change', () => {
+          const subject = box.dataset.subject;
+          const task = box.dataset.task;
+          localStorage.setItem(`ege_${subject}_${task}`, box.checked);
+        });
+      });
+    }
+
+    function loadEgeChecklist() {
+      document.querySelectorAll('.ege-checklist input[type="checkbox"]').forEach(box => {
+        const subject = box.dataset.subject;
+        const task = box.dataset.task;
+        const saved = localStorage.getItem(`ege_${subject}_${task}`);
+        if (saved !== null) {
+          box.checked = (saved === 'true');
+        }
+      });
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const mockDateInput = document.getElementById('mockDate');
+      if (mockDateInput) mockDateInput.value = todayStr;
+    }
+
+    // --- MOCK RESULTS JOURNAL ---
+    function saveMockResult() {
+      const subject = document.getElementById('mockSubject').value;
+      const score = document.getElementById('mockScore').value;
+      const date = document.getElementById('mockDate').value;
+      const notes = document.getElementById('mockNotes').value;
+
+      if (!score) {
+        alert("Введи полученный балл.");
+        return;
+      }
+
+      const mocks = JSON.parse(localStorage.getItem('ege_mocks') || '[]');
+      mocks.unshift({ subject, score: Number(score), date, notes, id: Date.now() });
+      localStorage.setItem('ege_mocks', JSON.stringify(mocks));
+
+      document.getElementById('mockScore').value = '';
+      document.getElementById('mockNotes').value = '';
+      loadMockResults();
+    }
+
+    function deleteMockResult(id) {
+      let mocks = JSON.parse(localStorage.getItem('ege_mocks') || '[]');
+      mocks = mocks.filter(m => m.id !== id);
+      localStorage.setItem('ege_mocks', JSON.stringify(mocks));
+      loadMockResults();
+    }
+
+    function loadMockResults() {
+      const container = document.getElementById('mockResultsList');
+      const mocks = JSON.parse(localStorage.getItem('ege_mocks') || '[]');
+
+      if (mocks.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.82rem;">Результатов пробников пока нет. Запиши первый после решения варианта.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      mocks.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'error-item';
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 700; color: #fff;">
+              ${m.subject}: <span style="color: #38bdf8; font-size: 1.05rem;">${m.score} баллов</span>
+            </div>
+            <div class="error-meta">${m.date} — ${m.notes || 'Без пометок'}</div>
+          </div>
+          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.72rem;" onclick="deleteMockResult(${m.id})">Удалить</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // --- CODEFORCES MISTAKES JOURNAL ---
+    function addCfMistake() {
+      const problem = document.getElementById('cfProblem').value.trim();
+      const type = document.getElementById('cfErrorType').value;
+      const topic = document.getElementById('cfTopic').value.trim();
+      const notes = document.getElementById('cfNotes').value.trim();
+
+      if (!problem) {
+        alert("Укажи код или название задачи.");
+        return;
+      }
+
+      const mistakes = JSON.parse(localStorage.getItem('cf_mistakes') || '[]');
+      const date = new Date().toLocaleDateString('ru-RU');
+      mistakes.unshift({ problem, type, topic, notes, date, id: Date.now() });
+      localStorage.setItem('cf_mistakes', JSON.stringify(mistakes));
+
+      document.getElementById('cfProblem').value = '';
+      document.getElementById('cfTopic').value = '';
+      document.getElementById('cfNotes').value = '';
+      loadCfMistakes();
+    }
+
+    function deleteCfMistake(id) {
+      let mistakes = JSON.parse(localStorage.getItem('cf_mistakes') || '[]');
+      mistakes = mistakes.filter(m => m.id !== id);
+      localStorage.setItem('cf_mistakes', JSON.stringify(mistakes));
+      loadCfMistakes();
+    }
+
+    function loadCfMistakes() {
+      const container = document.getElementById('cfMistakesList');
+      const mistakes = JSON.parse(localStorage.getItem('cf_mistakes') || '[]');
+
+      if (mistakes.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-muted); font-size: 0.82rem;">Ошибок пока не зафиксировано. Вноси сюда задачи после контестов.</div>';
+        return;
+      }
+
+      container.innerHTML = '';
+      mistakes.forEach(m => {
+        const item = document.createElement('div');
+        item.className = 'error-item';
+        item.innerHTML = `
+          <div>
+            <div style="font-weight: 700; color: #fff; display: flex; align-items: center; gap: 8px;">
+              <span>${m.problem}</span>
+              <span class="error-tag">${m.type}</span>
+              ${m.topic ? `<span style="font-size: 0.72rem; color: #38bdf8;">[${m.topic}]</span>` : ''}
+            </div>
+            <div style="font-size: 0.82rem; color: #cbd5e1; margin-top: 3px;">${m.notes}</div>
+            <div class="error-meta" style="margin-top: 2px;">${m.date}</div>
+          </div>
+          <button class="btn btn-outline" style="padding: 4px 8px; font-size: 0.72rem;" onclick="deleteCfMistake(${m.id})">Удалить</button>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // Start on load
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
