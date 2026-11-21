@@ -177,6 +177,16 @@
       font-size: 0.98rem;
     }
 
+    .deadline-status {
+      background: rgba(148, 163, 184, 0.12);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      white-space: nowrap;
+    }
+
     .deadline-days {
       margin-left: auto;
       font-weight: 700;
@@ -1237,15 +1247,16 @@
         <div class="deadline-head">
           <span class="deadline-tag">Дедлайн</span>
           <strong>Пересдача ПРОГА · 27–28 ноября</strong>
+          <span class="deadline-status">время уточняется · объявят в пн 23.11</span>
           <span class="deadline-days" id="retakeDays"></span>
         </div>
         <p>
-          Формат: 3 задачи div3/div4 уровня A–C по темам конспектов. Оценка закрывает два этапа грантового конкурса — остаётся собеседование с профессором. Если окно пересдачи совпадёт с занятием, занятие уступает.
+          Формат: 3 задачи div3/div4 уровня A–C по темам конспектов. Оценка закрывает два этапа грантового конкурса — остаётся собеседование с профессором. Время пока неизвестно: преподаватель объявит его в понедельник. План ниже от времени не зависит — если окно совпадёт с занятием или прогулкой, они уступают.
         </p>
         <div class="deadline-plan">
           <div class="deadline-row"><span class="d-day">сб 21</span><span>45 мин вечером: выписать шаблоны — бинпоиск, два указателя, сортировки, база ДП.</span></div>
           <div class="deadline-row"><span class="d-day">вс 22</span><span>Контест 09:00–12:00 как обычно; на разборе 13:00–14:00 отдельно пройти 3 задачи A–C.</span></div>
-          <div class="deadline-row"><span class="d-day">пн 23</span><span>16:30–17:15 вместо ЕГЭ-разминки: 3 задачи A–C на время, по одной.</span></div>
+          <div class="deadline-row is-key"><span class="d-day">пн 23</span><span>16:30–17:15: узнать время и формат окна, подтвердить его в чате/почте, сразу записать сюда. Дальше — 3 задачи A–C на время.</span></div>
           <div class="deadline-row is-key"><span class="d-day">вт 24</span><span>20:15–21:15 блок подготовки: слабая тема из конспекта + 3 задачи A–C.</span></div>
           <div class="deadline-row"><span class="d-day">ср 25</span><span>Без изменений: матмоделирование и ML. Прогу не трогаем, чтобы не копить долги.</span></div>
           <div class="deadline-row is-key"><span class="d-day">чт 26</span><span>15:45–16:45 вместо олимпиадной математики: последний разбор, шаблоны, слабые темы.</span></div>
