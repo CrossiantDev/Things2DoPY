@@ -128,6 +128,117 @@
       font-size: 0.68rem;
     }
 
+    .retake-pill {
+      background: rgba(251, 191, 36, 0.14);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fcd34d;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .retake-pill.is-today {
+      background: rgba(248, 113, 113, 0.18);
+      border-color: rgba(248, 113, 113, 0.5);
+      color: #fca5a5;
+    }
+
+    .deadline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-left: 4px solid #fbbf24;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      margin-bottom: 16px;
+    }
+
+    .deadline-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .deadline-tag {
+      background: rgba(251, 191, 36, 0.15);
+      border: 1px solid rgba(251, 191, 36, 0.35);
+      color: #fcd34d;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 0.66rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .deadline-head strong {
+      color: #fcd34d;
+      font-size: 0.98rem;
+    }
+
+    .deadline-days {
+      margin-left: auto;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #fcd34d;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .deadline-card p {
+      margin-top: 8px;
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+
+    .deadline-plan {
+      margin-top: 10px;
+    }
+
+    .deadline-row {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      gap: 10px;
+      padding: 7px 0;
+      border-top: 1px solid var(--border);
+      font-size: 0.82rem;
+      line-height: 1.45;
+      color: #cbd5e1;
+    }
+
+    .deadline-row:first-child {
+      border-top: 0;
+    }
+
+    .deadline-row .d-day {
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+
+    .deadline-row.is-key {
+      color: #fef3c7;
+    }
+
+    .deadline-row.is-key .d-day {
+      color: #fcd34d;
+      font-weight: 600;
+    }
+
+    @media (max-width: 520px) {
+      .deadline-row {
+        grid-template-columns: 1fr;
+        gap: 2px;
+      }
+      .deadline-days {
+        margin-left: 0;
+      }
+      .deadline-card {
+        padding: 12px 14px;
+      }
+    }
+
     .clock-widget {
       display: flex;
       align-items: baseline;
@@ -1065,7 +1176,8 @@
         <div class="brand-sub">
           <span class="age-badge">16 лет • 10 класс</span>
           <span>Олимпиадный разгон & ЕГЭ 90+</span>
-          <span class="build-tag">сборка 18.11</span>
+          <span class="build-tag">сборка 21.11</span>
+          <span class="retake-pill" id="retakePill">пересдача 27–28.11</span>
         </div>
       </div>
     </div>
@@ -1121,6 +1233,27 @@
 
     <!-- TAB 1: SCHEDULE VIEW -->
     <div id="tab-schedule">
+      <div class="deadline-card" id="deadlineCard">
+        <div class="deadline-head">
+          <span class="deadline-tag">Дедлайн</span>
+          <strong>Пересдача ПРОГА · 27–28 ноября</strong>
+          <span class="deadline-days" id="retakeDays"></span>
+        </div>
+        <p>
+          Формат: 3 задачи div3/div4 уровня A–C по темам конспектов. Оценка закрывает два этапа грантового конкурса — остаётся собеседование с профессором. Если окно пересдачи совпадёт с занятием, занятие уступает.
+        </p>
+        <div class="deadline-plan">
+          <div class="deadline-row"><span class="d-day">сб 21</span><span>45 мин вечером: выписать шаблоны — бинпоиск, два указателя, сортировки, база ДП.</span></div>
+          <div class="deadline-row"><span class="d-day">вс 22</span><span>Контест 09:00–12:00 как обычно; на разборе 13:00–14:00 отдельно пройти 3 задачи A–C.</span></div>
+          <div class="deadline-row"><span class="d-day">пн 23</span><span>16:30–17:15 вместо ЕГЭ-разминки: 3 задачи A–C на время, по одной.</span></div>
+          <div class="deadline-row is-key"><span class="d-day">вт 24</span><span>20:15–21:15 блок подготовки: слабая тема из конспекта + 3 задачи A–C.</span></div>
+          <div class="deadline-row"><span class="d-day">ср 25</span><span>Без изменений: матмоделирование и ML. Прогу не трогаем, чтобы не копить долги.</span></div>
+          <div class="deadline-row is-key"><span class="d-day">чт 26</span><span>15:45–16:45 вместо олимпиадной математики: последний разбор, шаблоны, слабые темы.</span></div>
+          <div class="deadline-row is-key"><span class="d-day">пт 27</span><span>Пересдача. Перед ней 16:30–17:00: одна задача A на скорость, открыть конспект, проверить связь.</span></div>
+          <div class="deadline-row"><span class="d-day">сб 28</span><span>Резерв. 09:00–10:30 — финальный прогон, если ещё не сдал; если сдал — отдых и друзья по плану.</span></div>
+        </div>
+      </div>
+
       <div class="day-selector" id="daySelector"></div>
 
       <!-- DAY SUMMARY & TOGGLE -->
@@ -1721,6 +1854,54 @@
     let activeCfFilter = "all";
     let toastTimer = null;
 
+    const RETAKE = { start: "2026-11-27", end: "2026-11-28" };
+
+    function daysUntil(dateStr) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const parts = dateStr.split("-").map(Number);
+      const target = new Date(parts[0], parts[1] - 1, parts[2]);
+      return Math.round((target - today) / 86400000);
+    }
+
+    function pluralDays(n) {
+      const mod10 = n % 10;
+      const mod100 = n % 100;
+      if (mod10 === 1 && mod100 !== 11) return "день";
+      if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return "дня";
+      return "дней";
+    }
+
+    function updateRetakeCountdown() {
+      const pill = document.getElementById("retakePill");
+      const daysEl = document.getElementById("retakeDays");
+      const card = document.getElementById("deadlineCard");
+      if (!pill) return;
+
+      const toStart = daysUntil(RETAKE.start);
+      const toEnd = daysUntil(RETAKE.end);
+      let pillText = "";
+      let daysText = "";
+      let today = false;
+
+      if (toStart > 0) {
+        pillText = "пересдача через " + toStart + " " + pluralDays(toStart);
+        daysText = "осталось " + toStart + " " + pluralDays(toStart);
+      } else if (toEnd >= 0) {
+        pillText = "пересдача сегодня";
+        daysText = "сегодня";
+        today = true;
+      } else {
+        pill.style.display = "none";
+        if (card) card.style.display = "none";
+        return;
+      }
+
+      if (pill.textContent !== pillText) pill.textContent = pillText;
+      pill.classList.toggle("is-today", today);
+      if (daysEl && daysEl.textContent !== daysText) daysEl.textContent = daysText;
+    }
+
     function init() {
       renderDaySelector();
       renderSlots();
@@ -1731,9 +1912,11 @@
       loadCfMistakes();
       bindEgeEvents();
       updateEgeProgress();
+      updateRetakeCountdown();
     }
 
     function updateClock() {
+      updateRetakeCountdown();
       const now = new Date();
       const timeStr = now.toLocaleTimeString('ru-RU', { hour12: false });
       const dateStr = now.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
